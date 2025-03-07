@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande de Repas</title>
+    <style>
+        body {
+            font-family: system-ui;
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {    
+            max-width: 525px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgb(140, 140, 140);
+        }
+        input {
+            font-family: system-ui;
+            padding: 11px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+        }
+        button {
+            font-family: system-ui;
+            font-weight: 600;
+            background-color: #0f172a;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #272e3f;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid rgb(207, 207, 207);
+            padding: 10px;
+        }
+        th {
+            font-weight: 500;
+            background-color: white;
+            color: #717171;
+        }
+        .download-btn {
+            background-color: #0f172a;
+            margin-top: 10px; 
+        }
+        .download-btn:hover {
+            background-color: #272e3f;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" size="62" />
+        <br><br>    
+            
+        <div class="meal-list">
+            <label><input type="checkbox" value="Pizza"> Pizza</label><br>
+            <label><input type="checkbox" value="Salade"> Salade</label><br>
+            <label><input type="checkbox" value="Burger"> Burger</label><br>
+            <label><input type="checkbox" value="Pâtes"> Pâtes</label><br>
+            <label><input type="checkbox" value="Sushi"> Sushi</label><br>
+            <label><input type="checkbox" value="Frites"> Frites</label><br>
+        
+
+        </div>
+        <br>
+        <button onclick="submitOrder()">Valider</button>
+    </div>
+    <br>
+    <div class="container">
+        <br>
+        <table id="orderTable">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Plats</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <br>
+        <button class="download-btn" onclick="downloadCSV()">Télécharger le récapitulatif</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", loadOrders);
+
+        function submitOrder() {
+            let name = document.getElementById("nameInput").value.trim();
+            if (!name) return alert("Veuillez entrer un nom.");
+            
+            let selectedMeals = Array.from(document.querySelectorAll('.meal-list input:checked'))
+                                    .map(checkbox => checkbox.value);
+            
+            if (selectedMeals.length === 0) return alert("Veuillez sélectionner au moins un plat.");
+
+            let newOrder = { name, meals: selectedMeals };
+            let orders = JSON.parse(localStorage.getItem("orders")) || [];
+            orders.push(newOrder);
+            localStorage.setItem("orders", JSON.stringify(orders));
+
+            document.getElementById("nameInput").value = "";
+            document.querySelectorAll('.meal-list input').forEach(checkbox => checkbox.checked = false);
+            displayOrders();
+        }
+
+        function displayOrders() {
+            let orders = JSON.parse(localStorage.getItem("orders")) || [];
+            let tableBody = document.querySelector("#orderTable tbody");
+            tableBody.innerHTML = "";
+            
+            orders.forEach(order => {
+                let row = `<tr><td>${order.name}</td><td>${order.meals.join(", ")}</td></tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function loadOrders() {
+            displayOrders();
+        }
+
+        function downloadCSV() {
+            let orders = JSON.parse(localStorage.getItem("orders")) || [];
+            if (orders.length === 0) return alert("Aucune commande à télécharger.");
+            
+            let csvContent = "Nom,Plats\n" + 
+                             orders.map(order => `${order.name},"${order.meals.join("; ")}"`).join("\n");
+
+            let blob = new Blob([csvContent], { type: "text/csv" });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = "commandes.csv";
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+
+</body>
+</html>
