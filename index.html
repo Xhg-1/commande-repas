@@ -8,6 +8,7 @@
     <style>
         body {
             font-family: system-ui;
+            font-weight: 300;
             background-color: #f8f9fa;
             padding: 20px;
             text-align: center;
@@ -27,25 +28,6 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-        
-        button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border: 1px solid #ccc;
-            border-radius: 7px;
-        }
-        button {
-            font-family: system-ui;
-            font-weight: 600;
-            background-color: #0f172a;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #272e3f;
-        }
-
         table {
             width: 100%;
             margin-top: 10px;
@@ -60,103 +42,160 @@
             background-color: white;
             color: #717171;
         }
+        button {
+
+            border: 1px solid rgb(238, 238, 238);
+            border-radius: 7px;
+            font-family: system-ui;
+            font-weight: 599;
+            color: white;
+            cursor: pointer;
+        }   
+        .delete-all-btn {
+            background-color: #EF4444;
+            margin-top: 10px; 
+            padding: 10px;
+            width: 100%;
+        }
+        .delete-all-btn:hover {
+            background-color: #B91C1C;
+        }
+        .delete-btn {
+            background-color: #0f172a;
+            padding: 6px;
+            width: 45%;
+        }
+        .delete-btn:hover {
+            background-color: #272e3f;
+        }
         .download-btn {
             background-color: #0f172a;
-            margin-top: 10px; 
+            padding: 10px;
+            width: 100%;
         }
         .download-btn:hover {
             background-color: #272e3f;
+        }
+        .checkbox {
+            accent-color: #0f172a;
+            width:15px;
+            height:15px;
+            
+        }
+        .meal-list{
+            display: flex;
+            flex-direction: column;
+
+        }
+        .meal-item {
+            display: flex;
+            align-items: center;
+            align-items: flex-end;
+            margin-top: -12px;
+            margin-bottom: -7px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" size="62" />
+        <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" size="61" />
         <br><br>    
             
         <div class="meal-list">
-            <label><input type="checkbox" value="Pizza"> Pizza</label><br>
-            <label><input type="checkbox" value="Salade"> Salade</label><br>
-            <label><input type="checkbox" value="Burger"> Burger</label><br>
-            <label><input type="checkbox" value="Pâtes"> Pâtes</label><br>
-            <label><input type="checkbox" value="Sushi"> Sushi</label><br>
-            <label><input type="checkbox" value="Frites"> Frites</label><br>
+            <label class="meal-item"><input class="checkbox" type="checkbox" value="Pizza"> Pizza</label><br>
+            <label class="meal-item"><input class="checkbox" type="checkbox" value="Salade"> Salade</label><br>
+            <label class="meal-item"><input class="checkbox" type="checkbox" value="Burger"> Burger</label><br>
+            <label class="meal-item"><input class="checkbox" type="checkbox" value="Pâtes"> Pâtes</label><br>
+            <label class="meal-item"><input class="checkbox" type="checkbox" value="Sushi"> Sushi</label><br>
+            <label class="meal-item"><input class="checkbox" type="checkbox" value="Frites"> Frites</label>
         
 
         </div>
         <br>
-        <button onclick="submitOrder()">Valider</button>
+        <button class="download-btn" onclick="addOrder()">Valider</button>
     </div>
     <br>
     <div class="container">
         <br>
-        <table id="orderTable">
+        <table>
             <thead>
                 <tr>
                     <th>Nom</th>
                     <th>Plats</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody id="order-list"></tbody>
         </table>
         <br>
         <button class="download-btn" onclick="downloadCSV()">Télécharger le récapitulatif</button>
+        <button class="delete-all-btn" onclick="confirmClearAll()">Tout supprimer</button>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", loadOrders);
+        let orders = JSON.parse(localStorage.getItem("orders")) || [];
 
-        function submitOrder() {
-            let name = document.getElementById("nameInput").value.trim();
+        function displayOrders() {
+            const tbody = document.getElementById("order-list");
+            tbody.innerHTML = "";
+            orders.forEach((order, index) => {
+                const row = `<tr>
+                    <td>${order.name}</td>
+                    <td>${order.meals.join(", ")}</td>
+                    <td><button class='delete-btn' onclick='deleteOrder(${index})'>⨯</button></td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+            localStorage.setItem("orders", JSON.stringify(orders));
+        }
+
+        function addOrder() {
+            const name = document.getElementById("nameInput").value.trim();
             if (!name) return alert("Veuillez entrer un nom.");
             
-            let selectedMeals = Array.from(document.querySelectorAll('.meal-list input:checked'))
+            const selectedMeals = Array.from(document.querySelectorAll('.meal-item input:checked'))
                                     .map(checkbox => checkbox.value);
             
             if (selectedMeals.length === 0) return alert("Veuillez sélectionner au moins un plat.");
 
-            let newOrder = { name, meals: selectedMeals };
-            let orders = JSON.parse(localStorage.getItem("orders")) || [];
-            orders.push(newOrder);
-            localStorage.setItem("orders", JSON.stringify(orders));
+            orders.push({ name, meals: selectedMeals });
 
             document.getElementById("nameInput").value = "";
-            document.querySelectorAll('.meal-list input').forEach(checkbox => checkbox.checked = false);
+            document.querySelectorAll('.meal-item input').forEach(input => input.checked = false);
             displayOrders();
         }
 
-        function displayOrders() {
-            let orders = JSON.parse(localStorage.getItem("orders")) || [];
-            let tableBody = document.querySelector("#orderTable tbody");
-            tableBody.innerHTML = "";
-            
-            orders.forEach(order => {
-                let row = `<tr><td>${order.name}</td><td>${order.meals.join(", ")}</td></tr>`;
-                tableBody.innerHTML += row;
-            });
+        function deleteOrder(index) {
+            orders.splice(index, 1);
+            displayOrders();
         }
 
-        function loadOrders() {
+        function confirmClearAll() {
+            if (confirm("Êtes-vous sûr de vouloir tout supprimer ? Cette action est irréversible.")) {
+                clearAll();
+            }
+        }
+
+        function clearAll() {
+            orders = [];
             displayOrders();
         }
 
         function downloadCSV() {
-            let orders = JSON.parse(localStorage.getItem("orders")) || [];
-            if (orders.length === 0) return alert("Aucune commande à télécharger.");
-            
-            let csvContent = "Nom,Plats\n" + 
-                             orders.map(order => `${order.name},"${order.meals.join("; ")}"`).join("\n");
-
-            let blob = new Blob([csvContent], { type: "text/csv" });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement("a");
+            const csvContent = "Nom,Plats\n" + orders.map(o => `${o.name},${o.meals.join("; ")}`).join("\n");
+            const blob = new Blob([csvContent], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
             a.href = url;
             a.download = "commandes.csv";
             a.click();
             URL.revokeObjectURL(url);
         }
-    </script>
 
+        displayOrders();
+    </script>
 </body>
 </html>
+
+
