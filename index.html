@@ -216,8 +216,26 @@
         }
     
         displayOrders();
+
     </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
     
+        const firebaseConfig = {
+            apiKey: "AIzaSyBo0RKbnRdWfZL3vL9wxiRCSAo5IVjwJ5U",
+            authDomain: "commande-repas.firebaseapp.com",
+            projectId: "commande-repas",
+            storageBucket: "commande-repas.firebasestorage.app",
+            messagingSenderId: "86197224505",
+            appId: "1:86197224505:web:b6fc2bd8d2927fea82b9e8"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const ordersRef = ref(db, "orders");
+    
+    </script>
 </body>
 </html>
 
