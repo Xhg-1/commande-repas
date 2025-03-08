@@ -92,6 +92,7 @@
         .meal-list{
             display: flex;
             flex-direction: column;
+
         }
         .meal-item {
             display: flex;
@@ -103,9 +104,11 @@
     </style>
 </head>
 <body>
+
     <div class="container">
         <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" />
-        <br><br>  
+        <br><br>    
+            
         <div class="meal-list">
             <label class="meal-item"><input class="checkbox" type="checkbox" value="Pizza"> Pizza</label><br>
             <label class="meal-item"><input class="checkbox" type="checkbox" value="Salade"> Salade</label><br>
@@ -113,6 +116,8 @@
             <label class="meal-item"><input class="checkbox" type="checkbox" value="Pâtes"> Pâtes</label><br>
             <label class="meal-item"><input class="checkbox" type="checkbox" value="Sushi"> Sushi</label><br>
             <label class="meal-item"><input class="checkbox" type="checkbox" value="Frites"> Frites</label>
+        
+
         </div>
         <br>
         <button class="download-btn" onclick="addOrder()">Valider</button>
@@ -134,54 +139,94 @@
         <button class="download-btn" onclick="downloadCSV()">Télécharger le récapitulatif</button>
         <button class="delete-all-btn" onclick="confirmClearAll()">Tout supprimer</button>
     </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyBo0RKbnRdWfZL3vL9wxiRCSAo5IVjwJ5U",
+            authDomain: "commande-repas.firebaseapp.com",
+            databaseURL: "https://commande-repas.firebaseio.com",
+            projectId: "commande-repas",
+            storageBucket: "commande-repas.firebasestorage.app",
+            messagingSenderId: "86197224505",
+            appId: "1:86197224505:web:b6fc2bd8d2927fea82b9e8"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const ordersRef = ref(db, "orders");
+
+    </script>
     <script>
+
+
         let orders = JSON.parse(localStorage.getItem("orders")) || [];
         let userID = localStorage.getItem("userID");
+    
+        // Si l'utilisateur n'a pas d'ID, on lui en assigne un
         if (!userID) {
-            userID = Date.now().toString();
+            userID = Date.now().toString(); // ID unique basé sur le timestamp
             localStorage.setItem("userID", userID);
         }
+    
         function displayOrders() {
             const tbody = document.getElementById("order-list");
             tbody.innerHTML = "";
+    
             orders.forEach((order, index) => {
                 const isOwner = order.userID === userID; // Vérifie si c'est l'utilisateur qui a ajouté la commande
                 const deleteButton = isOwner 
                     ? `<button class='delete-btn' onclick='deleteOrder(${index})'>⨯</button>` 
                     : `<button class='delete-btn' disabled style="opacity: 0.5; cursor: not-allowed;">⨯</button>`;
+    
                 const row = `<tr>
                     <td>${order.name}</td>
                     <td>${order.meals.join(", ")}</td>
                     <td>${deleteButton}</td>
                 </tr>`;
+    
                 tbody.innerHTML += row;
             });
+    
             localStorage.setItem("orders", JSON.stringify(orders));
         }
+    
         function addOrder() {
             const name = document.getElementById("nameInput").value.trim();
             if (!name) return alert("Veuillez entrer un nom.");
+            
             const selectedMeals = Array.from(document.querySelectorAll('.meal-item input:checked'))
                                     .map(checkbox => checkbox.value);
+            
             if (selectedMeals.length === 0) return alert("Veuillez sélectionner au moins un plat.");
-            orders.push({ name, meals: selectedMeals, userID });
+    
+            orders.push({ name, meals: selectedMeals, userID }); // Associe la commande à l'utilisateur
+    
             document.getElementById("nameInput").value = "";
             document.querySelectorAll('.meal-item input').forEach(input => input.checked = false);
             displayOrders();
         }
+    
         function deleteOrder(index) {
-            orders.splice(index, 1);
+            if (confirm("Êtes-vous sûr de vouloir supprimer cette commande ? Cette action est irréversible.")) {
+                orders.splice(index, 1);
+            }
             displayOrders();
         }
+    
         function confirmClearAll() {
             if (confirm("Êtes-vous sûr de vouloir tout supprimer ? Cette action est irréversible.")) {
                 clearAll();
             }
         }
+    
         function clearAll() {
             orders = [];
             displayOrders();
         }
+    
         function downloadCSV() {
             const csvContent = "Nom,Plats\n" + orders.map(o => `${o.name},${o.meals.join("; ")}`).join("\n");
             const blob = new Blob([csvContent], { type: "text/csv" });
@@ -192,23 +237,11 @@
             a.click();
             URL.revokeObjectURL(url);
         }
+    
         displayOrders();
+
     </script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyBo0RKbnRdWfZL3vL9wxiRCSAo5IVjwJ5U",
-            authDomain: "commande-repas.firebaseapp.com",
-            projectId: "commande-repas",
-            storageBucket: "commande-repas.firebasestorage.app",
-            messagingSenderId: "86197224505",
-            appId: "1:86197224505:web:b6fc2bd8d2927fea82b9e8"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const ordersRef = ref(db, "orders");
-    </script>
+
 </body>
 </html>
 
