@@ -23,27 +23,34 @@
         }
         input {
             font-family: system-ui;
-            padding: 11px;
-            margin-top: 10px;
-            border: 1px solid #ccc;
+            padding: 12px;
+            width: 95%;
             border-radius: 5px;
+            border: 1px solid #ccc;
         }
         table {
             width: 100%;
-            margin-top: 10px;
             border-collapse: collapse;
         }
         table, th, td {
-            border: 1px solid rgb(207, 207, 207);
-            padding: 10px;
+            border-bottom: 1px solid rgb(207, 207, 207);
+            padding: 17px;
+            font-size: 15px;
         }
         th {
-            font-weight: 500;
+            font-weight: 500; 
             background-color: white;
             color: #717171;
+            text-align: left;
+        }
+        td {
+            text-align: left;
+        }
+        td:last-child {
+            width: 60px;
+            text-align: center;
         }
         button {
-
             border: 1px solid rgb(238, 238, 238);
             border-radius: 7px;
             font-family: system-ui;
@@ -62,8 +69,8 @@
         }
         .delete-btn {
             background-color: #0f172a;
-            padding: 6px;
-            width: 45%;
+            padding: 9px;
+            width: 70%;
         }
         .delete-btn:hover {
             background-color: #272e3f;
@@ -78,9 +85,9 @@
         }
         .checkbox {
             accent-color: #0f172a;
-            width:15px;
-            height:15px;
-            
+            width: 18px;
+            height: 18px;
+            margin-top: 6px;
         }
         .meal-list{
             display: flex;
@@ -99,7 +106,7 @@
 <body>
 
     <div class="container">
-        <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" size="61" />
+        <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" />
         <br><br>    
             
         <div class="meal-list">
