@@ -140,108 +140,150 @@
         <button class="delete-all-btn" onclick="confirmClearAll()">Tout supprimer</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
-    
-        const firebaseConfig = {
-            apiKey: "AIzaSyBo0RKbnRdWfZL3vL9wxiRCSAo5IVjwJ5U",
-            authDomain: "commande-repas.firebaseapp.com",
-            databaseURL: "https://commande-repas.firebaseio.com",
-            projectId: "commande-repas",
-            storageBucket: "commande-repas.firebasestorage.app",
-            messagingSenderId: "86197224505",
-            appId: "1:86197224505:web:b6fc2bd8d2927fea82b9e8"
-        };
-    
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const ordersRef = ref(db, "orders");
-
-    </script>
     <script>
-
-
-        let orders = JSON.parse(localStorage.getItem("orders")) || [];
+        // 🔹 URL de l'API Google Apps Script qui interagit avec Google Sheets
+        const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbynmxrrMKE4cIsTlp4jx22lJZQpHtPwVwuUxT54myaFFxwkNWBUORgnHadaqeFQN_bfjQ/exec"; 
+    
+        // 🔹 Récupération de l'identifiant unique de l'utilisateur (pour différencier les commandes)
         let userID = localStorage.getItem("userID");
     
-        // Si l'utilisateur n'a pas d'ID, on lui en assigne un
+        // Si aucun ID utilisateur n'existe, on en génère un
         if (!userID) {
-            userID = Date.now().toString(); // ID unique basé sur le timestamp
+            userID = Date.now().toString(); // Génère un ID basé sur l'heure actuelle
             localStorage.setItem("userID", userID);
         }
     
-        function displayOrders() {
-            const tbody = document.getElementById("order-list");
-            tbody.innerHTML = "";
-    
-            orders.forEach((order, index) => {
-                const isOwner = order.userID === userID; // Vérifie si c'est l'utilisateur qui a ajouté la commande
-                const deleteButton = isOwner 
-                    ? `<button class='delete-btn' onclick='deleteOrder(${index})'>⨯</button>` 
-                    : `<button class='delete-btn' disabled style="opacity: 0.5; cursor: not-allowed;">⨯</button>`;
-    
-                const row = `<tr>
-                    <td>${order.name}</td>
-                    <td>${order.meals.join(", ")}</td>
-                    <td>${deleteButton}</td>
-                </tr>`;
-    
-                tbody.innerHTML += row;
-            });
-    
-            localStorage.setItem("orders", JSON.stringify(orders));
+        // 🔹 Fonction pour récupérer les commandes depuis Google Sheets
+        async function fetchOrders() {
+    try {
+        console.log("Fetching orders..."); // Vérification du déclenchement
+        const response = await fetch(SHEET_API_URL);
+        console.log("Response received:", response); // Vérification de la réponse brute
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+
+        const orders = await response.json(); 
+        console.log("Orders received:", orders); // Vérifie les données récupérées
+
+        // Vérifier si `orders` est bien un tableau
+        if (!Array.isArray(orders)) {
+            throw new Error("Les données reçues ne sont pas un tableau !");
+        }
+
+        const tbody = document.getElementById("order-list");
+        tbody.innerHTML = "";
+
+        orders.forEach((order, index) => {
+            const isOwner = order.userID === userID;
+            const deleteButton = isOwner 
+                ? `<button class='delete-btn' onclick='deleteOrder(${index})'>⨯</button>` 
+                : `<button class='delete-btn' disabled style="opacity: 0.5; cursor: not-allowed;">⨯</button>`;
+
+            const row = `<tr>
+                <td>${order.name}</td>
+                <td>${order.meals.join(", ")}</td>
+                <td>${deleteButton}</td>
+            </tr>`;
+
+            tbody.innerHTML += row;
+        });
+
+    } catch (error) {
+        console.error("Erreur lors de la récupération des commandes :", error);
+        alert("Impossible de récupérer les commandes. Vérifiez la console.");
+    }
+}
+
     
-        function addOrder() {
-            const name = document.getElementById("nameInput").value.trim();
-            if (!name) return alert("Veuillez entrer un nom.");
-            
+        // 🔹 Fonction pour ajouter une nouvelle commande
+        async function addOrder() {
+            const name = document.getElementById("nameInput").value.trim(); // Récupère le nom entré
+            if (!name) return alert("Veuillez entrer un nom."); // Vérifie que le champ n'est pas vide
+    
+            // Récupère les plats sélectionnés (cochés)
             const selectedMeals = Array.from(document.querySelectorAll('.meal-item input:checked'))
-                                    .map(checkbox => checkbox.value);
-            
-            if (selectedMeals.length === 0) return alert("Veuillez sélectionner au moins un plat.");
+                                      .map(checkbox => checkbox.value);
     
-            orders.push({ name, meals: selectedMeals, userID }); // Associe la commande à l'utilisateur
+            if (selectedMeals.length === 0) return alert("Veuillez sélectionner au moins un plat."); // Vérifie qu'au moins un plat est sélectionné
     
+            // Crée un objet contenant les informations de la commande
+            const order = { name, meals: selectedMeals, userID };
+    
+            try {
+                // Envoie une requête POST pour ajouter la commande à Google Sheets
+                const response = await fetch(SHEET_API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(order), // Convertit les données en JSON
+                });
+    
+                const result = await response.json();
+                if (result.success) {
+                    fetchOrders(); // Rafraîchit l'affichage des commandes
+                } else {
+                    alert("Erreur lors de l'enregistrement.");
+                }
+    
+            } catch (error) {
+                console.error("Erreur lors de l'ajout de la commande :", error);
+            }
+    
+            // Réinitialise les champs après l'ajout de la commande
             document.getElementById("nameInput").value = "";
             document.querySelectorAll('.meal-item input').forEach(input => input.checked = false);
-            displayOrders();
         }
     
-        function deleteOrder(index) {
-            if (confirm("Êtes-vous sûr de vouloir supprimer cette commande ? Cette action est irréversible.")) {
-                orders.splice(index, 1);
+        // 🔹 Fonction pour supprimer une commande
+        async function deleteOrder(index) {
+            if (!confirm("Êtes-vous sûr de vouloir supprimer cette commande ?")) return;
+    
+            try {
+                // Ici, tu devrais envoyer une requête à l'API pour supprimer la commande sur Google Sheets.
+                // L'API actuelle ne supporte pas encore la suppression, il faut modifier le script Apps Script.
+    
+                alert("Pour l'instant, la suppression ne fonctionne que localement.");
+                fetchOrders(); // Met à jour l'affichage
+            } catch (error) {
+                console.error("Erreur lors de la suppression de la commande :", error);
             }
-            displayOrders();
         }
     
+        // 🔹 Fonction pour télécharger un fichier CSV des commandes
+        function downloadCSV() {
+            fetch(SHEET_API_URL)
+                .then(response => response.json())
+                .then(orders => {
+                    const csvContent = "Nom,Plats\n" + orders.map(o => `${o.name},${o.meals.join("; ")}`).join("\n");
+                    const blob = new Blob([csvContent], { type: "text/csv" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "commandes.csv";
+                    a.click();
+                    URL.revokeObjectURL(url);
+                })
+                .catch(error => console.error("Erreur lors de la création du fichier CSV :", error));
+        }
+    
+        // 🔹 Fonction pour confirmer la suppression de toutes les commandes
         function confirmClearAll() {
             if (confirm("Êtes-vous sûr de vouloir tout supprimer ? Cette action est irréversible.")) {
                 clearAll();
             }
         }
     
-        function clearAll() {
-            orders = [];
-            displayOrders();
+        // 🔹 Fonction pour effacer toutes les commandes (nécessite modification du script Apps Script)
+        async function clearAll() {
+            alert("La suppression complète n'est pas encore implémentée.");
+            fetchOrders();
         }
     
-        function downloadCSV() {
-            const csvContent = "Nom,Plats\n" + orders.map(o => `${o.name},${o.meals.join("; ")}`).join("\n");
-            const blob = new Blob([csvContent], { type: "text/csv" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "commandes.csv";
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-    
-        displayOrders();
-
+        // 🔹 Affichage des commandes au chargement de la page
+        fetchOrders();
     </script>
-
+    
 </body>
 </html>
 
