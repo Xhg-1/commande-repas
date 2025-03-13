@@ -12,7 +12,7 @@
             font-weight: 300;
             padding: 20px;
             text-align: center;
-            background: linear-gradient(to right, #010116, #2832ae);
+            background: linear-gradient(to right bottom, #010116, #2832ae);
         }
         .container {    
             max-width: 525px;
@@ -108,7 +108,6 @@
         .meal-list{
             display: flex;
             flex-direction: column;
-
         }
         .meal-item {
             display: flex;
@@ -172,7 +171,7 @@
     <nav>
         <a href="index.html">Découvrir</a>
         <a href="menu.html"class="active">Menu</a>
-        <a href="gestion.html" class="disabled">Gestion</a>
+        <a href="gestion.html" onclick="verifAcces(event)">Gestion</a>
         <a href="help.html">Assistance</a>
         <a href="login.html">Connexion</a>
     </nav> <br><br><br><br><br>
@@ -375,7 +374,24 @@
 
             textInput.style.display = checkbox.checked ? "block" : "none";
         }
-    
+
+        function verifAcces(event) {
+            var userRole = localStorage.getItem("role");
+            if (userRole !== "admin") {
+                event.preventDefault(); // Empêche la navigation
+                alert("Accès refusé : Vous devez être administrateur.");
+            } else {
+                window.location.href = "gestion.html"; // Redirige si admin
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var savedUsername = localStorage.getItem("username");
+            if (savedUsername) {
+                document.getElementById("nameInput").value = savedUsername;
+            }
+        });
+
         // 🔹 Affichage des commandes au chargement de la page
         fetchOrders();
     </script>
