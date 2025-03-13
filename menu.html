@@ -8,21 +8,24 @@
     <style>
         body {
             font-family: system-ui;
+            color: white;
             font-weight: 300;
-            background-color: #f4f4f4;
             padding: 20px;
             text-align: center;
+            background: linear-gradient(to right, #010116, #2832ae);
         }
         .container {    
             max-width: 525px;
             margin: 0 auto;
-            background: white;
+            background: #313338;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
         input {
             font-family: system-ui;
+            color: white;
+            background-color: #1e1f22;
             padding: 12px;
             width: 95%;
             border-radius: 5px;
@@ -39,8 +42,8 @@
         }
         th {
             font-weight: 500; 
-            background-color: white;
-            color: #717171;
+            background-color: #313338;
+            color: #cacaca;
             text-align: left;
         }
         td {
@@ -60,34 +63,48 @@
             cursor: pointer;
         }   
         .delete-all-btn {
-            background-color: #EF4444;
+            background-color: #5865f2;
             margin-top: 10px; 
-            width: 100%;
+            width: 100%; 
         }
         .delete-all-btn:hover {
-            background-color: #ec6262;
+            background-color: #4d59da;
         }
         .delete-btn {
-            background-color: #262626;
+            background-color: #1e1f22;
             padding: 9px;
             width: 70%;
         }
         .delete-btn:hover {
-            background-color: #4b4b4b;
+            background-color: #18181b;
         }
         .download-btn {
-            background-color: #28a745;
+            background-color: #5865f2;
             width: 100%;
         }
         .download-btn:hover {
-            background-color: #50b567;
+            background-color: #4d59da;
         }
-        .checkbox {
-            accent-color: #0f172a;
+        input[type="checkbox"] {
+            color: white;
+            appearance: none;
             width: 17px;
             height: 17px;
-            margin-top: 6px;
+            background-color: #1e1f22;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s, border-color 0.3s;
+            
         }
+
+        input[type="checkbox"]:hover {
+            background-color: #18181b;
+        }
+
+        input[type="checkbox"]:checked {
+            background-color: #5865f2;
+        }
+  
         .meal-list{
             display: flex;
             flex-direction: column;
@@ -96,26 +113,106 @@
         .meal-item {
             display: flex;
             align-items: center;
-            align-items: flex-end;
-            margin-top: -12px;
-            margin-bottom: -7px;
+            margin-top: -10px;
+            margin-bottom: -10px;
+            color: #cacaca;
+        }
+        nav {
+            background-color: #00000000;
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        nav a {
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #5865f2;
+            border-radius: 10px;
+        }
+
+        .active {
+            background-color: rgb(255, 255, 255);
+            font-weight: bold;
+            color: black;
+            border-radius: 10px;
+        }
+        .content {
+            padding: 50px;
+            font-size: 24px;
+            color: #ffffff;
+            text-align: left;
+            max-width: 1200px;
+            margin: auto;
+        }
+        h4{
+            font-weight: 400;
+            color: #afafaf;
+        }
+        .disabled {
+            pointer-events: none; /* Désactive le clic */
+            opacity: 0.5; /* Rend l'onglet plus transparent */
+            cursor: not-allowed; /* Change le curseur */
         }
     </style>
 </head>
 <body>
+    <nav>
+        <a href="index.html">Découvrir</a>
+        <a href="menu.html"class="active">Menu</a>
+        <a href="gestion.html" class="disabled">Gestion</a>
+        <a href="help.html">Assistance</a>
+        <a href="login.html">Connexion</a>
+    </nav> <br><br><br><br><br>
 
     <div class="container">
-        <h2>Choix des plats</h2>
+        <h2>Choisissez vos plats !</h2>
+        <h4>Cliquer sur Autres si vous souhaitez preciser votre commande </h4>
         <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" />
         <br><br>    
             
         <div class="meal-list">
-            <label class="meal-item"><input class="checkbox" type="checkbox" value="Pizza"> Pizza</label><br>
-            <label class="meal-item"><input class="checkbox" type="checkbox" value="Salade"> Salade</label><br>
-            <label class="meal-item"><input class="checkbox" type="checkbox" value="Burger"> Burger</label><br>
-            <label class="meal-item"><input class="checkbox" type="checkbox" value="Pâtes"> Pâtes</label><br>
-            <label class="meal-item"><input class="checkbox" type="checkbox" value="Sushi"> Sushi</label><br>
-            <label class="meal-item"><input class="checkbox" type="checkbox" id="otherCheckbox" onchange="toggleOtherInput()"> Autres : </label> <br>
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Pizza">
+                Pizza
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Salade">
+                Salade
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Burger">
+                Burger
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Pâtes">
+                Pâtes
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Sushi">
+                 Sushi
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" id="otherCheckbox" onchange="toggleOtherInput()">
+                Autres : 
+            </label> <br>
         <input type="text" id="otherInput" placeholder="Précisez votre choix" style="display: none;"><br>
         
         
@@ -136,7 +233,6 @@
             <tbody id="order-list"></tbody>
         </table>
         <br>
-        <button class="download-btn" onclick="downloadCSV()">Télécharger le récapitulatif</button>
         <button class="delete-all-btn" onclick="confirmClearAll()">Tout supprimer</button>
     </div>
 
@@ -200,7 +296,6 @@
 
             } catch (error) {
                 console.error("Erreur lors de la récupération des commandes :", error);
-                alert("Impossible de récupérer les commandes. Vérifiez la console.");
             }
         }
 
@@ -243,35 +338,16 @@
 
     
         // 🔹 Fonction pour supprimer une commande
-        async function deleteOrder(index) {
-            if (!confirm("Êtes-vous sûr de vouloir supprimer cette commande ?")) return;
-    
-            try {
-                // Ici, tu devrais envoyer une requête à l'API pour supprimer la commande sur Google Sheets.
-                // L'API actuelle ne supporte pas encore la suppression, il faut modifier le script Apps Script.
-    
-                alert("Pour l'instant, la suppression ne fonctionne que localement.");
-                fetchOrders(); // Met à jour l'affichage
-            } catch (error) {
-                console.error("Erreur lors de la suppression de la commande :", error);
-            }
-        }
-    
-        // 🔹 Fonction pour télécharger un fichier CSV des commandes
-        function downloadCSV() {
-            fetch(SHEET_API_URL)
-                .then(response => response.json())
-                .then(orders => {
-                    const csvContent = "Nom,Plats\n" + orders.map(o => `${o.name},${o.meals.join("; ")}`).join("\n");
-                    const blob = new Blob([csvContent], { type: "text/csv" });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = "commandes.csv";
-                    a.click();
-                    URL.revokeObjectURL(url);
-                })
-                .catch(error => console.error("Erreur lors de la création du fichier CSV :", error));
+        async function deleteOrder(userID) {
+            let response = await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "supprimerCommande",
+                    userID: userID
+                }),
+                headers: { "Content-Type": "application/json" }
+            });
+            return await response.json();
         }
     
         // 🔹 Fonction pour confirmer la suppression de toutes les commandes
@@ -283,8 +359,14 @@
     
         // 🔹 Fonction pour effacer toutes les commandes (nécessite modification du script Apps Script)
         async function clearAll() {
-            alert("La suppression complète n'est pas encore implémentée.");
-            fetchOrders();
+            let response = await fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "effacerToutesCommandes"
+                }),
+                headers: { "Content-Type": "application/json" }
+            });
+            return await response.json();
         }
 
         function toggleOtherInput() {
