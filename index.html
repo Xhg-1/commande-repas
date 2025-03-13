@@ -3,69 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion</title>
+    <title>AppCantine</title>
     <style>
         body {
-            font-family: system-ui;
-            font-weight: 300;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin: 0;
+            padding: 0;
             text-align: center;
-        }
-        input {
             font-family: system-ui;
-            padding: 12px;
-            margin: 8px 0;
-            width: 95%;
-            border-radius: 5px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        button {
-            background: #28a745;
             color: white;
-            font-weight: 599;
-            border: none;
-            margin: 8px 0;
-            padding: 12px;
-            width: 100%;
-            border-radius: 5px;
-            cursor: pointer;
+            font-weight: 600;
+            height: 97vh;
+            background: linear-gradient(to right, #000000, #2832ae);
         }
-        button:hover{
-            background-color: #4ab162;
+
+        /* Barre de navigation */
+        nav {
+            background-color: #00000000;
+            padding: 10px 0;
+            display: flex;
+            border-radius: 10px;
+            justify-content: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #5865f2;
+            border-radius: 10px;
+        }
+
+        .active {
+            background-color: rgb(255, 255, 255);
+            font-weight: bold;
+            color: black;
+            border-radius: 10px;
+        }
+        .content {
+            padding: 50px;
+            font-size: 24px;
+            color: #ffffff;
+            text-align: left;
+            max-width: 1200px;
+            margin: auto;
+        }
+        h1 {
+            font-weight: 1000;
+            font-size: 60px;
+        }
+        p {
+            font-weight: 500;
+            font-size: 19px;
+        }
+        .disabled {
+            pointer-events: none; /* Désactive le clic */
+            opacity: 0.5; /* Rend l'onglet plus transparent */
+            cursor: not-allowed; /* Change le curseur */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Connexion</h2>
-        <input type="text" id="username" placeholder="Nom d'utilisateur">
-        <input type="password" id="password" placeholder="Mot de passe">
-        <button onclick="login()">Se connecter</button>
+
+    <nav>
+        <a href="index.html" class="active">Découvrir</a>
+        <a href="menu.html">Menu</a>
+        <a href="gestion.html" class="disabled">Gestion</a>
+        <a href="help.html">Assistance</a>
+        <a href="login.html">Connexion</a>
+    </nav>
+
+    <div class="content"><br><br>
+        <h1>BIENVENUE <br>
+            SUR <br>
+            APPCANTINE</h1>
+        <p>Facilitez la gestion des repas avec notre plateforme intuitive.<br>
+            Chaque enseignant peut sélectionner son menu en quelques clics, <br>
+            renseigner son nom, et valider sa commande.<br>
+            Plus besoin de jongler avec des messages ou des listes manuscrites</p>
     </div>
 
-    <script>
-        function login() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-            
-            if(username && password) {
-                localStorage.setItem("username", username);
-                window.location.href = "menu.html"; // Redirige vers la page de sélection des plats
-            } else {
-                alert("Veuillez remplir tous les champs.");
-            }
-        }
-    </script>
 </body>
 </html>
+
 
