@@ -13,7 +13,7 @@
             color: white;
             font-weight: 600;
             height: 97vh;
-            background: linear-gradient(to right, #000000, #2832ae);
+            background: linear-gradient(to right bottom, #000000, #2832ae);
         }
 
         /* Barre de navigation */
@@ -61,11 +61,6 @@
             font-weight: 500;
             font-size: 19px;
         }
-        .disabled {
-            pointer-events: none; /* Désactive le clic */
-            opacity: 0.5; /* Rend l'onglet plus transparent */
-            cursor: not-allowed; /* Change le curseur */
-        }
     </style>
 </head>
 <body>
@@ -73,7 +68,7 @@
     <nav>
         <a href="index.html" class="active">Découvrir</a>
         <a href="menu.html">Menu</a>
-        <a href="gestion.html" class="disabled">Gestion</a>
+        <a href="gestion.html" onclick="verifAcces(event)">Gestion</a>
         <a href="help.html">Assistance</a>
         <a href="login.html">Connexion</a>
     </nav>
@@ -87,8 +82,24 @@
             renseigner son nom, et valider sa commande.<br>
             Plus besoin de jongler avec des messages ou des listes manuscrites</p>
     </div>
+    <script>
+
+        function verifAcces(event) {
+            var userRole = localStorage.getItem("role");
+            if (userRole !== "admin") {
+                event.preventDefault(); // Empêche la navigation
+                alert("Accès refusé : Vous devez être administrateur.");
+            } else {
+                window.location.href = "gestion.html"; // Redirige si admin
+            }
+        }
+
+    </script>
 
 </body>
 </html>
+
+
+
 
 
