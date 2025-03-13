@@ -14,7 +14,7 @@
             justify-content: center;
             align-items: center;
             height: 97vh;
-            background: linear-gradient(to right, #010116, #2832ae);
+            background: linear-gradient(to right bottom, #010116, #2832ae);
         }
         .container {
             background:  #313338;
@@ -25,7 +25,7 @@
         }
         input {
             font-family: system-ui;
-            color: #afb4bb;
+            color: #ffffff;
             background-color: #1e1f22;
             padding: 12px;
             margin: 8px 0;
@@ -103,7 +103,7 @@
     <nav>
         <a href="index.html">Découvrir</a>
         <a href="menu.html">Menu</a>
-        <a href="gestion.html" class="disabled">Gestion</a>
+        <a href="gestion.html" onclick="verifAcces(event)">Gestion</a>
         <a href="help.html">Assistance</a>
         <a href="login.html" class="active">Connexion</a>
     </nav>
@@ -122,12 +122,32 @@
             var password = document.getElementById("password").value;
             
             if(username && password) {
+                // Stocke le nom d'utilisateur
                 localStorage.setItem("username", username);
-                window.location.href = "menu.html"; // Redirige vers la page de sélection des plats
+                
+                // Vérifie si l'utilisateur est admin (exemple simplifié)
+                if (username.toLowerCase() === "admin") {
+                    localStorage.setItem("role", "admin");
+                    window.location.href = "gestion.html"; // Redirige vers la page gestion
+                } else {
+                    localStorage.setItem("role", "user");
+                    window.location.href = "menu.html"; // Redirige vers la page menu
+                }
             } else {
                 alert("Veuillez remplir tous les champs.");
             }
         }
+
+        function verifAcces(event) {
+            var userRole = localStorage.getItem("role");
+            if (userRole !== "admin") {
+                event.preventDefault(); // Empêche la navigation
+                alert("Accès refusé : Vous devez être administrateur.");
+            } else {
+                window.location.href = "gestion.html"; // Redirige si admin
+            }
+        }
+
     </script>
 </body>
 </html>
