@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <style>
+        body {
+            font-family: system-ui;
+            color: white;
+            font-weight: 300;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 97vh;
+            background: linear-gradient(to right, #010116, #2832ae);
+        }
+        .container {
+            background:  #313338;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input {
+            font-family: system-ui;
+            color: #afb4bb;
+            background-color: #1e1f22;
+            padding: 12px;
+            margin: 8px 0;
+            width: 95%;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background: #5865f2;
+            font-family: system-ui;
+            color: white;
+            font-weight: 599;
+            border: none;
+            margin: 8px 0;
+            padding: 12px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover{
+            background-color: #4d59da;
+        }
+        nav {
+            background-color: #00000000;
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        nav a {
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 14px 20px;
+            font-size: 18px;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #5865f2;
+            border-radius: 10px;
+        }
+
+        .active {
+            background-color: rgb(255, 255, 255);
+            font-weight: bold;
+            color: black;
+            border-radius: 10px;
+        }
+        .content {
+            padding: 50px;
+            font-size: 24px;
+            color: #ffffff;
+            text-align: left;
+            max-width: 1200px;
+            margin: auto;
+        }
+        h4{
+            font-weight: 400;
+            color: #afafaf;
+        }
+        .disabled {
+            pointer-events: none; /* Désactive le clic */
+            opacity: 0.5; /* Rend l'onglet plus transparent */
+            cursor: not-allowed; /* Change le curseur */
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Découvrir</a>
+        <a href="menu.html">Menu</a>
+        <a href="gestion.html" class="disabled">Gestion</a>
+        <a href="help.html" class="active">Assistance</a>
+        <a href="login.html">Connexion</a>
+    </nav>
+</body>
+</html>
+
