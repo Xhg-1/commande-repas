@@ -14,9 +14,10 @@
             justify-content: center;
             align-items: center;
             height: 97vh;
-            background: linear-gradient(to right, #010116, #2832ae);
+            background: linear-gradient(to right bottom, #010116, #2832ae);
         }
         .container {
+            width: 750px;
             background:  #313338;
             padding: 20px;
             border-radius: 10px;
@@ -25,11 +26,11 @@
         }
         input {
             font-family: system-ui;
-            color: #afb4bb;
+            color: #ffffff;
             background-color: #1e1f22;
             padding: 12px;
             margin: 8px 0;
-            width: 95%;
+            width: 96%;
             border-radius: 5px;
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
@@ -97,6 +98,30 @@
             opacity: 0.5; /* Rend l'onglet plus transparent */
             cursor: not-allowed; /* Change le curseur */
         }
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+
+            font-family: system-ui;
+            color: #ffffff;
+            background-color: #1e1f22;
+        }
+        textarea {
+            width: 96%;
+            padding: 12px;
+            border-radius: 5px;
+            font-family: system-ui;
+            color: #ffffff;
+            background-color: #1e1f22;
+        }
+        h3 {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            font-weight: 500;
+            font-size: 16px;
+        }
 
     </style>
 </head>
@@ -104,10 +129,46 @@
     <nav>
         <a href="index.html">Découvrir</a>
         <a href="menu.html">Menu</a>
-        <a href="gestion.html" class="disabled">Gestion</a>
+        <a href="gestion.html" onclick="verifAcces(event)">Gestion</a>
         <a href="help.html" class="active">Assistance</a>
         <a href="login.html">Connexion</a>
     </nav>
+
+    <div class="container">
+        <h2>Besoin d'aide ?</h2>
+        <h4>Remplissez ce formulaire pour poser une question ou signaler un problème.</h4>
+        
+        <form action="submit_form.php" method="post">
+            <input type="text" id="name" name="name" placeholder="Votre prénom" required>
+    
+            <h3 for="type">Type de demande :</h3>
+            <select id="type" name="type">
+                <option value="question">Question</option>
+                <option value="bug">Problème technique</option>
+                <option value="suggestion">Suggestion</option>
+                <option value="autre">Autre</option>
+            </select><br>
+    
+            <h3 for="message">Décrivez votre problème ou question :</h3>
+            <textarea id="message" name="message" rows="5" required></textarea><br><br>
+    
+            <button type="submit">Envoyer</button>
+        </form>
+    </div>
+
+    <script>
+
+        function verifAcces(event) {
+            var userRole = localStorage.getItem("role");
+            if (userRole !== "admin") {
+                event.preventDefault(); // Empêche la navigation
+                alert("Accès refusé : Vous devez être administrateur.");
+            } else {
+                window.location.href = "gestion.html"; // Redirige si admin
+            }
+        }
+
+    </script>
 </body>
 </html>
 
