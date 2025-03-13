@@ -138,25 +138,36 @@
         <h2>Besoin d'aide ?</h2>
         <h4>Remplissez ce formulaire pour poser une question ou signaler un problème.</h4>
         
-        <form action="" method="post">
-            <input type="text" id="name" name="name" placeholder="Votre prénom" required>
+        <form   
+            action="https://formspree.io/f/xrbpgwve"
+            method="POST">
+            <input type="text" id="name" name="name" placeholder="Votre Nom" required>
+    
+            <input type="email" id="email" name="email" placeholder="Votre Email" required>
     
             <h3 for="type">Type de demande :</h3>
             <select id="type" name="type">
+                <option value="question">-</option>
                 <option value="question">Question</option>
                 <option value="bug">Problème technique</option>
                 <option value="suggestion">Suggestion</option>
                 <option value="autre">Autre</option>
-            </select><br>
+            </select> <br>
     
-            <h3 for="message">Décrivez votre problème ou question :</h3>
-            <textarea id="message" name="message" rows="5" required></textarea><br><br>
+            <h3>Décrivez votre problème ou question :</h3>
+            <textarea id="message"  name="message" rows="5" required></textarea><br>
     
-            <button class="submit" type="submit" disabled style="opacity: 0.5; cursor: not-allowed;">Envoyer</button>
+            <button type="submit">Envoyer</button>
         </form>
     </div>
 
     <script>
+        function SupprimerMessage() {
+            document.getElementById("name").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("type").value = "";
+            document.getElementById("message").value = "";
+        }
 
         function verifAcces(event) {
             var userRole = localStorage.getItem("role");
@@ -168,7 +179,10 @@
             }
         }
 
+
+
     </script>
+
 </body>
 </html>
 
