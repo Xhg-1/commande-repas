@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion</title>
+    <title>Gestion du Stock</title>
     <style>
         body {
             font-family: system-ui;
@@ -17,11 +17,12 @@
             background: linear-gradient(to right bottom, #010116, #2832ae);
         }
         .container {
-            background:  #313338;
+            background: #313338;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
+            width: 550px;
         }
         input {
             font-family: system-ui;
@@ -33,7 +34,7 @@
             border-radius: 5px;
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
-        button {
+        .AddButton {
             background: #5865f2;
             font-family: system-ui;
             color: white;
@@ -45,11 +46,23 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        button:hover{
+        .AddButton:hover {
             background-color: #4d59da;
         }
+        .QuantityButton {
+            background: #2a2a2a;
+            font-family: system-ui;
+            color: white;
+            font-weight: 300;
+            border: none;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .QuantityButton:hover {
+            background-color: #1c1c1c;
+        }
         nav {
-            background-color: #00000000;
             padding: 10px 0;
             display: flex;
             justify-content: center;
@@ -58,7 +71,6 @@
             top: 0;
             left: 0;
         }
-
         nav a {
             color: white;
             font-weight: 600;
@@ -68,29 +80,36 @@
             border-radius: 10px;
             transition: background-color 0.3s;
         }
-
         nav a:hover {
             background-color: #5865f2;
-            border-radius: 10px;
         }
-
         .active {
-            background-color: rgb(255, 255, 255);
-            font-weight: bold;
+            background-color: white;
             color: black;
-            border-radius: 10px;
         }
-        .content {
-            padding: 50px;
-            font-size: 24px;
-            color: #ffffff;
-            text-align: left;
-            max-width: 1200px;
-            margin: auto;
+        ul {
+            list-style: none;
+            padding: 0;
         }
-        h4{
-            font-weight: 400;
-            color: #afafaf;
+        li {
+            background: #1e1f22;
+            padding: 10px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 5px;
+        }
+        .btn-group {
+            display: flex;
+            align-items: center;
+        }
+        .btn-group button {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            font-size: 16px;
+            margin-left: 5px;
         }
     </style>
 </head>
@@ -101,20 +120,88 @@
         <a href="gestion.html" class="active">Gestion</a>
         <a href="help.html">Assistance</a>
         <a href="login.html">Connexion</a>
-    </nav>
-    <script>
+    </nav><br><br><br><br><br>
 
-    function verifAcces(event) {
-            var userRole = localStorage.getItem("role");
-            if (userRole !== "admin") {
-                event.preventDefault(); // Empêche la navigation
-                alert("Accès refusé : Vous devez être administrateur.");
+    <div class="container">
+        <h2>Gestion du Stock</h2>
+        <input type="text" id="nom" placeholder="Nom de l'aliment">
+        <input type="number" id="quantite" placeholder="Quantité">
+        <button class="AddButton" onclick="ajouterAliment()">Ajouter</button>
+        <ul id="listeStock"></ul>
+    </div>
+
+    <script>
+        let stock = JSON.parse(localStorage.getItem("stock")) || [];
+
+        function afficherStock() {
+            let liste = document.getElementById("listeStock");
+            liste.innerHTML = "";
+
+            stock.forEach((aliment, index) => {
+                let li = document.createElement("li");
+                li.innerHTML = `
+                    <span>${aliment.nom} - <b>${aliment.quantite}</b></span>
+                    <div class="btn-group">
+                        <button class='QuantityButton' onclick="modifierQuantite(${index}, -1)">-</button>
+                        <button class='QuantityButton' onclick="modifierQuantite(${index}, 1)">+</button>
+                        <button class='QuantityButton' onclick="supprimerAliment(${index})">⨯</button>
+                    </div>
+                `;
+                liste.appendChild(li);
+            });
+
+            localStorage.setItem("stock", JSON.stringify(stock));
+        }
+
+        function ajouterAliment() {
+            let nom = document.getElementById("nom").value.trim();
+            let quantite = parseInt(document.getElementById("quantite").value.trim());
+
+            if (!nom || quantite <= 0 || isNaN(quantite)) {
+                alert("Entrez un nom et une quantité valide !");
+                return;
+            }
+
+            let existant = stock.find(a => a.nom.toLowerCase() === nom.toLowerCase());
+
+            if (existant) {
+                existant.quantite += quantite;
             } else {
-                window.location.href = "gestion.html"; // Redirige si admin
+                stock.push({ nom, quantite });
+            }
+
+            document.getElementById("nom").value = "";
+            document.getElementById("quantite").value = "";
+
+            afficherStock();
+        }
+
+        function modifierQuantite(index, valeur) {
+            if (stock[index]) {
+                stock[index].quantite += valeur;
+
+                if (stock[index].quantite <= 0) {
+                    stock.splice(index, 1);
+                }
+
+                afficherStock();
             }
         }
 
+        function supprimerAliment(index) {
+            stock.splice(index, 1);
+            afficherStock();
+        }
+
+        function verifAcces(event) {
+            var userRole = localStorage.getItem("role");
+            if (userRole !== "admin") {
+                event.preventDefault();
+                alert("Accès refusé : Vous devez être administrateur.");
+            }
+        }
+
+        afficherStock();
     </script>
 </body>
 </html>
-
