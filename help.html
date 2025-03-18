@@ -172,7 +172,7 @@
         function verifAcces(event) {
             var userRole = localStorage.getItem("role");
             if (userRole !== "admin") {
-                event.preventDefault(); // Empêche la navigation
+                event.preventDefault();
                 alert("Accès refusé : Vous devez être administrateur.");
             } else {
                 window.location.href = "gestion.html"; // Redirige si admin
