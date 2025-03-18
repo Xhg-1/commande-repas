@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commande de Repas</title>
+    <title>Commande</title>
     <style>
         body {
             font-family: system-ui;
@@ -12,10 +11,10 @@
             font-weight: 300;
             padding: 20px;
             text-align: center;
-            background: linear-gradient(to right bottom, #010116, #2832ae);
+            background: linear-gradient(to right bottom, #0a0738, #303abf);
         }
         .container {    
-            max-width: 525px;
+            max-width: 50%;
             margin: 0 auto;
             background: #313338;
             padding: 20px;
@@ -63,12 +62,12 @@
             cursor: pointer;
         }   
         .delete-all-btn {
-            background-color: #5865f2;
+            background-color: #5764f2;
             margin-top: 10px; 
             width: 100%; 
         }
         .delete-all-btn:hover {
-            background-color: #4d59da;
+            background-color: #6773f3;
         }
         .delete-btn {
             background-color: #1e1f22;
@@ -79,11 +78,11 @@
             background-color: #18181b;
         }
         .download-btn {
-            background-color: #5865f2;
+            background-color: #5764f2;
             width: 100%;
         }
         .download-btn:hover {
-            background-color: #4d59da;
+            background-color: #6773f3;
         }
         input[type="checkbox"] {
             color: white;
@@ -102,7 +101,7 @@
         }
 
         input[type="checkbox"]:checked {
-            background-color: #5865f2;
+            background-color: #5764f2;
         }
   
         .meal-list{
@@ -138,7 +137,7 @@
         }
 
         nav a:hover {
-            background-color: #5865f2;
+            background-color: #5764f2;
             border-radius: 10px;
         }
 
@@ -160,21 +159,132 @@
             font-weight: 400;
             color: #afafaf;
         }
-        .disabled {
-            pointer-events: none; /* Désactive le clic */
-            opacity: 0.5; /* Rend l'onglet plus transparent */
-            cursor: not-allowed; /* Change le curseur */
-        }
+ 
     </style>
+
+    <script type="module">
+        // 🔥 Importation des modules Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // 🔹 Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBo0RKbnRdWfZL3vL9wxiRCSAo5IVjwJ5U",
+            authDomain: "commande-repas.firebaseapp.com",
+            projectId: "commande-repas",
+            storageBucket: "commande-repas.appspot.com",
+            messagingSenderId: "86197224505",
+            appId: "1:86197224505:web:b6fc2bd8d2927fea82b9e8"
+        };
+
+        // 📌 Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+ 
+        async function addOrder() {
+    const name = document.getElementById("nameInput").value.trim();
+    const item = Array.from(document.querySelectorAll('.meal-item input:checked'))
+                                .map(checkbox => checkbox.value);
+
+    // Si la case "Autres" est cochée, on ajoute la valeur du champ "Autres"
+    const otherInput = document.getElementById("otherInput").value.trim();
+    if (document.getElementById("otherCheckbox").checked && otherInput !== "") {
+        item.push(otherInput);
+    }
+
+    // Si aucun plat n'est sélectionné
+    if (item.length === 0) return alert("Veuillez sélectionner au moins un plat.");
+
+    if (name === "") {
+        return alert("Veuillez entrer un nom !");
+    }
+
+    const order = { name, meals: item };
+
+    try {
+        await addDoc(collection(db, "orders"), {
+            name: name,
+            item: item,
+            status: "En préparation"
+        });
+
+        // ✅ Effacer les champs après envoi
+        document.getElementById("nameInput").value = "";
+        document.getElementById("otherInput").value = "";
+        document.querySelectorAll('.meal-item input').forEach(input => input.checked = false);
+        alert("Commande ajoutée avec succès !");
+    } catch (error) {
+        console.error("Erreur lors de l'ajout :", error);
+        alert("Erreur lors de l'ajout de la commande. Vérifiez la console.");
+    }
+}
+
+        window.deleteOrder = async function(orderId) {
+            try {
+                await deleteDoc(doc(db, "orders", orderId));
+                alert("Commande supprimée avec succès !");
+            } catch (error) {
+                console.error("Erreur lors de la suppression :", error);
+                alert("Erreur lors de la suppression de la commande.");
+            }
+        };
+
+        window.deleteAllOrders = async function() {
+            if (confirm("Êtes-vous sûr de vouloir tout supprimer ? Cette action est irréversible.")) {
+            const snapshot = await getDocs(collection(db, "orders"));
+            const batch = writeBatch(db);
+            snapshot.forEach((docSnapshot) => {
+                batch.delete(doc(db, "orders", docSnapshot.id));
+            });
+            try {
+                await batch.commit();
+                alert("Toutes les commandes ont été supprimées !");
+            } catch (error) {
+                console.error("Erreur lors de la suppression de toutes les commandes :", error);
+                alert("Erreur lors de la suppression de toutes les commandes.");
+            }
+            }
+        };
+
+        const ordersTable = document.getElementById("orders");
+        onSnapshot(collection(db, "orders"), (snapshot) => {
+            ordersTable.innerHTML = "";
+            snapshot.forEach((docSnapshot) => {
+                let order = docSnapshot.data();
+                const orderId = docSnapshot.id;
+                ordersTable.innerHTML += `
+                    <tr>
+                        <td>${order.name}</td>
+                        <td>${order.item}</td>
+                        <td>${order.status}</td>
+                        <td><button class="delete-btn" onclick="deleteOrder('${orderId}')">⨯</button></td>
+                    </tr>
+                `;
+            });
+        });
+
+        document.getElementById("orderButton").addEventListener("click", addOrder);
+
+        window.toggleOtherInput = async function() {
+            var checkbox = document.getElementById("otherCheckbox");
+            var textInput = document.getElementById("otherInput");
+
+            textInput.style.display = checkbox.checked ? "block" : "none";
+        };
+
+
+
+    </script>
+
 </head>
 <body>
     <nav>
         <a href="index.html">Découvrir</a>
-        <a href="menu.html"class="active">Menu</a>
         <a href="gestion.html" onclick="verifAcces(event)">Gestion</a>
+        <a href="menu.html"class="active">Commande</a>
         <a href="help.html">Assistance</a>
         <a href="login.html">Connexion</a>
-    </nav> <br><br><br><br><br>
+    </nav> <br><br><br>
 
     <div class="container">
         <h2>Choisissez vos plats !</h2>
@@ -209,197 +319,33 @@
             </label><br>
 
             <label class="meal-item">
-                <input class="checkbox" type="checkbox" id="otherCheckbox" onchange="toggleOtherInput()">
+                <input class="checkbox" type="checkbox" id="otherCheckbox" value="" onchange="toggleOtherInput()">
                 Autres : 
             </label> <br>
         <input type="text" id="otherInput" placeholder="Précisez votre choix" style="display: none;"><br>
         
         
         </div>
-        <button class="download-btn" onclick="addOrder()">Valider</button>
+        <button class="download-btn" id="orderButton">Valider</button>
     </div>
     <br>
     <div class="container">
         <br>
-        <table>
+        <table id="ordersTable">
             <thead>
                 <tr>
                     <th>Nom</th>
-                    <th>Plats</th>
+                    <th>Plat commandé</th>
+                    <th>Statut</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="order-list"></tbody>
+            <tbody id="orders"></tbody>
         </table>
         <br>
-        <button class="delete-all-btn" onclick="confirmClearAll()">Tout supprimer</button>
+        <button class="delete-all-btn" onclick="deleteAllOrders()">Tout supprimer</button>
     </div>
-
-    <script>
-        // 🔹 URL de l'API Google Apps Script qui interagit avec Google Sheets
-        const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyqMS15gtVZTFuQK0U0qdO5EYCkPdYmm8X_XHrQOAIHF-rhrWHntnugILggnAMIMSon/exec";  
-    
-        // 🔹 Récupération de l'identifiant unique de l'utilisateur (pour différencier les commandes)
-        let userID = localStorage.getItem("userID");
-    
-        // Si aucun ID utilisateur n'existe, on en génère un
-        if (!userID) {
-            userID = Date.now().toString(); // Génère un ID basé sur l'heure actuelle
-            localStorage.setItem("userID", userID);
-        }
-        
-    
-        // 🔹 Fonction pour récupérer les commandes depuis Google Sheets
-        async function fetchOrders() {
-            try {
-                console.log("Fetching orders..."); // Vérification du déclenchement
-                const response = await fetch(SHEET_API_URL);
-                console.log("Response received:", response); // Vérification de la réponse brute
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-
-                const orders = await response.json(); 
-                console.log("Orders received:", orders); // Vérifie les données récupérées
-                console.log("User ID actuel:", userID);
-                console.log("Commandes récupérées:", orders);
-
-
-                // Vérifier si `orders` est bien un tableau
-                if (!Array.isArray(orders)) {
-                    throw new Error("Les données reçues ne sont pas un tableau !");
-                }
-
-                const tbody = document.getElementById("order-list");
-                tbody.innerHTML = "";
-
-                orders.forEach((order, index) => {
-                    console.log(`Comparaison userID: ${order.userID} === ${userID}`); // Debugging
-                    
-                    const deleteButton = (order.userID === userID) 
-                        ? `<button class='delete-btn' onclick='deleteOrder(${index})'>⨯</button>` 
-                        : `<button class='delete-btn' disabled style="opacity: 0.5; cursor: not-allowed;">⨯</button>`;
-
-
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${order.name}</td>
-                        <td>${order.meals.join(", ")}</td>
-                        <td>${deleteButton}</td>
-                    `;
-
-                    tbody.appendChild(row);
-                });
-
-
-            } catch (error) {
-                console.error("Erreur lors de la récupération des commandes :", error);
-            }
-        }
-
-    
-        // 🔹 Fonction pour ajouter une nouvelle commande
-
-        async function addOrder() {
-            const name = document.getElementById("nameInput").value.trim();
-            if (!name) return alert("Veuillez entrer un nom.");
-
-            const selectedMeals = Array.from(document.querySelectorAll('.meal-item input:checked'))
-                                    .map(checkbox => checkbox.value);
-            if (selectedMeals.length === 0) return alert("Veuillez sélectionner au moins un plat.");
-
-            const order = { name, meals: selectedMeals, userID };
-
-            try {
-                const response = await fetch(SHEET_API_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(order)
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    alert("Commande ajoutée !");
-                    fetchOrders(); // Rafraîchir les commandes si nécessaire
-                } else {
-                    alert("Erreur lors de l'ajout.");
-                }
-
-            } catch (error) {
-                console.error("Erreur lors de l'ajout :", error);
-            }
-
-            document.getElementById("nameInput").value = "";
-            document.getElementById("otherInput").value = "";
-            document.querySelectorAll('.meal-item input').forEach(input => input.checked = false);
-        }
-
-    
-        // 🔹 Fonction pour supprimer une commande
-        async function deleteOrder(userID) {
-            let response = await fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify({
-                    action: "supprimerCommande",
-                    userID: userID
-                }),
-                headers: { "Content-Type": "application/json" }
-            });
-            return await response.json();
-        }
-    
-        // 🔹 Fonction pour confirmer la suppression de toutes les commandes
-        function confirmClearAll() {
-            if (confirm("Êtes-vous sûr de vouloir tout supprimer ? Cette action est irréversible.")) {
-                clearAll();
-            }
-        }
-    
-        // 🔹 Fonction pour effacer toutes les commandes (nécessite modification du script Apps Script)
-        async function clearAll() {
-            let response = await fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify({
-                    action: "effacerToutesCommandes"
-                }),
-                headers: { "Content-Type": "application/json" }
-            });
-            return await response.json();
-        }
-
-        function toggleOtherInput() {
-            var checkbox = document.getElementById("otherCheckbox");
-            var textInput = document.getElementById("otherInput");
-
-            textInput.style.display = checkbox.checked ? "block" : "none";
-        }
-
-        function verifAcces(event) {
-            var userRole = localStorage.getItem("role");
-            if (userRole !== "admin") {
-                event.preventDefault(); // Empêche la navigation
-                alert("Accès refusé : Vous devez être administrateur.");
-            } else {
-                window.location.href = "gestion.html"; // Redirige si admin
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            var savedUsername = localStorage.getItem("username");
-            if (savedUsername) {
-                document.getElementById("nameInput").value = savedUsername;
-            }
-        });
-
-        // 🔹 Affichage des commandes au chargement de la page
-        fetchOrders();
-    </script>
-    
 </body>
 </html>
-
-
-
 
 
