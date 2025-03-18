@@ -14,9 +14,10 @@
             justify-content: center;
             align-items: center;
             height: 97vh;
-            background: linear-gradient(to right bottom, #010116, #2832ae);
+            background: linear-gradient(to right bottom, #0a0738, #303abf);
         }
         .container {
+            min-width: 30%;
             background:  #313338;
             padding: 20px;
             border-radius: 10px;
@@ -34,7 +35,7 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
         button {
-            background: #5865f2;
+            background: #5764f2;
             font-family: system-ui;
             color: white;
             font-weight: 599;
@@ -46,7 +47,7 @@
             cursor: pointer;
         }
         button:hover{
-            background-color: #4d59da;
+            background-color: #6773f3;
         }
         nav {
             background-color: #00000000;
@@ -70,7 +71,7 @@
         }
 
         nav a:hover {
-            background-color: #5865f2;
+            background-color: #5764f2;
             border-radius: 10px;
         }
 
@@ -102,8 +103,8 @@
 <body>
     <nav>
         <a href="index.html">Découvrir</a>
-        <a href="menu.html">Menu</a>
         <a href="gestion.html" onclick="verifAcces(event)">Gestion</a>
+        <a href="menu.html">Commande</a>
         <a href="help.html">Assistance</a>
         <a href="login.html" class="active">Connexion</a>
     </nav>
