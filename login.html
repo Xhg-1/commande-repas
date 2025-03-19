@@ -14,14 +14,14 @@
             justify-content: center;
             align-items: center;
             height: 97vh;
-            background: linear-gradient(to right bottom, #0a0738, #303abf);
+            background: linear-gradient(to right bottom, #f68601, #f12d2d);
         }
         .container {
             min-width: 30%;
             background:  #313338;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
             text-align: center;
         }
         input {
@@ -35,7 +35,7 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
         button {
-            background: #5764f2;
+            background: #f68601;
             font-family: system-ui;
             color: white;
             font-weight: 599;
@@ -45,9 +45,10 @@
             width: 100%;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
         button:hover{
-            background-color: #6773f3;
+            background-color: #f12d2d;
         }
         nav {
             background-color: #00000000;
@@ -71,14 +72,14 @@
         }
 
         nav a:hover {
-            background-color: #5764f2;
+            background-color: #f68601;
             border-radius: 10px;
         }
 
         .active {
-            background-color: rgb(255, 255, 255);
+            background-color: #f12d2d;
             font-weight: bold;
-            color: black;
+            color: #ffffff;
             border-radius: 10px;
         }
         .content {
@@ -100,11 +101,11 @@
         }
     </style>
 </head>
-<body>
+<body onload="checkUserStatus()">
     <nav>
         <a href="index.html">Découvrir</a>
-        <a href="gestion.html" onclick="verifAcces(event)">Gestion</a>
-        <a href="menu.html">Commande</a>
+        <a href="gestion.html" id="gestion" onclick="verifAcces(event)">Gestion</a>
+        <a href="menu.html" id="menu" onclick="verifAcces(event)">Commande</a>
         <a href="help.html">Assistance</a>
         <a href="login.html" class="active">Connexion</a>
     </nav>
@@ -122,17 +123,17 @@
             var username = document.getElementById("username").value;
             var password = document.getElementById("password").value;
             
-            if(username && password) {
+            if (username && password) {
                 // Stocke le nom d'utilisateur
                 localStorage.setItem("username", username);
                 
-                // Vérifie si l'utilisateur est admin (exemple simplifié)
+                // Vérifie si l'utilisateur est admin
                 if (username.toLowerCase() === "admin") {
                     localStorage.setItem("role", "admin");
                     window.location.href = "gestion.html"; // Redirige vers la page gestion
                 } else {
                     localStorage.setItem("role", "user");
-                    window.location.href = "menu.html";
+                    window.location.href = "menu.html"; // Redirige vers la page menu
                 }
             } else {
                 alert("Veuillez remplir tous les champs.");
@@ -141,14 +142,45 @@
 
         function verifAcces(event) {
             var userRole = localStorage.getItem("role");
-            if (userRole !== "admin") {
-                event.preventDefault(); // Empêche la navigation
+            
+            // Bloque l'accès à "Gestion" si l'utilisateur n'est pas admin
+            if (event.target.id === "gestion" && userRole !== "admin") {
+                event.preventDefault();
                 alert("Accès refusé : Vous devez être administrateur.");
-            } else {
-                window.location.href = "gestion.html"; // Redirige si admin
+                return;
+            }
+
+            // Bloque l'accès à "Commande" si l'utilisateur n'est pas connecté
+            if (event.target.id === "menu" && !userRole) {
+                event.preventDefault();
+                alert("Accès refusé : Vous devez être connecté.");
+                return;
             }
         }
 
+        function checkUserStatus() {
+            var userRole = localStorage.getItem("role");
+
+            // Désactiver les onglets si l'utilisateur n'est pas connecté
+            if (!userRole) {
+                document.getElementById("menu").classList.add("disabled");
+            }
+            if (userRole !== "admin") {
+                document.getElementById("gestion").classList.add("disabled");
+            }
+        }
+
+        // Redirection automatique si l'utilisateur essaie d'accéder à une page sans autorisation
+        (function protectPages() {
+            var userRole = localStorage.getItem("role");
+            var currentPage = window.location.pathname.split("/").pop();
+
+            if ((currentPage === "gestion.html" && userRole !== "admin") || 
+                (currentPage === "menu.html" && !userRole)) {
+                alert("Accès interdit. Vous devez être connecté.");
+                window.location.href = "login.html";
+            }
+        })();
     </script>
 </body>
 </html>
