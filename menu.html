@@ -3,56 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion</title>
+    <title>Commande</title>
     <style>
         body {
             font-family: system-ui;
             color: white;
             font-weight: 300;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 97vh;
+            padding: 20px;
+            text-align: center;
             background: linear-gradient(to right bottom, #f68601, #f12d2d);
         }
-        .container {
-            min-width: 30%;
-            background:  #1c1e26;
+        .container {    
+            max-width: 60%;
+            margin: 0 auto;
+            background: #1c1e26; /* Gris foncé */
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
-            text-align: center;
         }
         input {
             font-family: system-ui;
-            color: #ffffff;
-            background-color: #15171d;
+            color: #afb4bb;
+            background-color: #15171d; /* Gris très foncé */
             padding: 12px;
-            margin: 8px 0;
             width: 95%;
             border-radius: 5px;
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
-        button {
-            background: #f68601;
-            font-family: system-ui;
-            color: white;
-            font-weight: 599;
-            border: none;
-            margin: 8px 0;
-            padding: 12px;
+        table {
             width: 100%;
-            border-radius: 5px;
-            cursor: pointer;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Lignes plus visibles */
+            padding: 17px;
+            font-size: 15px;
+        }
+        th {
+            font-weight: 500; 
+            background-color: #1c1e26; /* Même couleur que le container */
+            color: #cacaca;
+            text-align: left;
+        }
+        td {
+            text-align: left;
+        }
+        td:last-child {
+            width: 60px;
+            text-align: center;
+        }
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 12px;
+            font-family: system-ui;
+            font-weight: 599;
+            color: white;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
+            cursor: pointer;
+        }   
+        .delete-all-btn, .download-btn {
+            background-color: #f68601;
+            width: 100%;
             transition: background-color 0.3s;
         }
-        button:hover{
+        .delete-all-btn:hover, .download-btn:hover {
             background-color: #f12d2d;
         }
+        .delete-btn {
+            background-color: #101216;
+            padding: 9px;
+            width: 70%;
+            transition: background-color 0.3s;
+        }
+        .delete-btn:hover {
+            background-color: #0e0f13;
+        }
+        input[type="checkbox"] {
+            appearance: none;
+            width: 17px;
+            height: 17px;
+            background-color: #15171d;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        input[type="checkbox"]:hover {
+            background-color: #18181b;
+        }
+        input[type="checkbox"]:checked {
+            background-color: #f68601;
+        }
+        .meal-list {
+            display: flex;
+            flex-direction: column;
+        }
+        .meal-item {
+            display: flex;
+            align-items: center;
+            margin-top: -10px;
+            margin-bottom: -10px;
+            color: #cacaca;
+        }
         nav {
-            background-color: #00000000;
+            background-color: transparent;
             padding: 10px 0;
             display: flex;
             justify-content: center;
@@ -61,7 +115,6 @@
             top: 0;
             left: 0;
         }
-
         nav a {
             color: white;
             font-weight: 600;
@@ -71,12 +124,10 @@
             border-radius: 10px;
             transition: background-color 0.3s;
         }
-
         nav a:hover {
             background-color: #f68601;
             border-radius: 10px;
         }
-
         .active {
             background-color: #f12d2d;
             font-weight: bold;
@@ -91,55 +142,198 @@
             max-width: 1200px;
             margin: auto;
         }
-        h4{
+        h4 {
             font-weight: 400;
             color: #afafaf;
         }
         .disabled {
             pointer-events: none; /* Désactive le clic */
             opacity: 0.5; /* Rend l'onglet plus transparent */
-            cursor: not-allowed; /* Change le curseur */
+            cursor: not-allowed;
         }
-    </style>
+
+    </style> 
+
 </head>
 <body onload="checkUserStatus()">
     <nav>
         <a href="index.html">Découvrir</a>
         <a href="gestion.html" id="gestion" onclick="verifAcces(event)">Gestion</a>
-        <a href="menu.html" id="menu" onclick="verifAcces(event)">Commande</a>
+        <a href="menu.html" id="menu" onclick="verifAcces(event)" class="active">Commande</a>
         <a href="help.html">Assistance</a>
-        <a href="login.html" class="active">Connexion</a>
-    </nav>
-    
-    <div class="container">
-        <h2>Ha, vous revoilà !</h2>
-        <h4> Le festin peut enfin commencer !</h4>
-        <input type="text" id="username" placeholder="Nom d'utilisateur">
-        <input type="password" id="password" placeholder="Mot de passe">
-        <button onclick="login()">Connexion</button>
-    </div>
+        <a href="login.html">Connexion</a>
+    </nav> <br><br><br>
 
-    <script>
-        function login() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
+    <div class="container">
+        <h2>Choisissez vos plats !</h2>
+        <h4>Cliquer sur autres si vous voulez preciser votre commande !</h4>
+        <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" />
+        <br><br>    
             
-            if (username && password) {
-                // Stocke le nom d'utilisateur
-                localStorage.setItem("username", username);
-                
-                // Vérifie si l'utilisateur est admin
-                if (username.toLowerCase() === "admin") {
-                    localStorage.setItem("role", "admin");
-                    window.location.href = "gestion.html"; // Redirige vers la page gestion
-                } else {
-                    localStorage.setItem("role", "user");
-                    window.location.href = "menu.html"; // Redirige vers la page menu
-                }
-            } else {
-                alert("Veuillez remplir tous les champs.");
+        <div class="meal-list">
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Pizza">
+                Pizza
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Salade">
+                Salade
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Burger">
+                Burger
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Pâtes">
+                Pâtes
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Sushi">
+                 Sushi
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" id="otherCheckbox" value="" onchange="toggleOtherInput()">
+                Autres : 
+            </label> <br>
+        <input type="text" id="otherInput" placeholder="Précisez votre choix" style="display: none;"><br>
+        
+        
+        </div>
+        <button class="download-btn" id="orderButton">Valider</button>
+    </div>
+    <br>
+    <div class="container">
+        <br>
+        <table id="ordersTable">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Plat commandé</th>
+                    <th>Statut</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="orders"></tbody>
+        </table>
+        <br>
+        <button class="delete-all-btn" onclick="deleteAllOrders()">Tout supprimer</button>
+    </div>
+    <script type="module">
+        // 🔥 Importation des modules Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // 🔹 Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBo0RKbnRdWfZL3vL9wxiRCSAo5IVjwJ5U",
+            authDomain: "commande-repas.firebaseapp.com",
+            projectId: "commande-repas",
+            storageBucket: "commande-repas.appspot.com",
+            messagingSenderId: "86197224505",
+            appId: "1:86197224505:web:b6fc2bd8d2927fea82b9e8"
+        };
+
+        // 📌 Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+ 
+        async function addOrder() {
+    const name = document.getElementById("nameInput").value.trim();
+    const item = Array.from(document.querySelectorAll('.meal-item input:checked'))
+                                .map(checkbox => checkbox.value);
+
+    // Si la case "Autres" est cochée, on ajoute la valeur du champ "Autres"
+    const otherInput = document.getElementById("otherInput").value.trim();
+    if (document.getElementById("otherCheckbox").checked && otherInput !== "") {
+        item.push(otherInput);
+    }
+
+    // Si aucun plat n'est sélectionné
+    if (item.length === 0) return alert("Veuillez sélectionner au moins un plat.");
+
+    if (name === "") {
+        return alert("Veuillez entrer un nom !");
+    }
+
+    const order = { name, meals: item };
+
+    try {
+        await addDoc(collection(db, "orders"), {
+            name: name,
+            item: item,
+            status: "En préparation"
+        });
+
+        // ✅ Effacer les champs après envoi
+        document.getElementById("nameInput").value = "";
+        document.getElementById("otherInput").value = "";
+        document.querySelectorAll('.meal-item input').forEach(input => input.checked = false);
+        alert("Commande ajoutée avec succès !");
+    } catch (error) {
+        console.error("Erreur lors de l'ajout :", error);
+        alert("Erreur lors de l'ajout de la commande. Vérifiez la console.");
+    }
+}
+
+        window.deleteOrder = async function(orderId) {
+            try {
+                await deleteDoc(doc(db, "orders", orderId));
+                alert("Commande supprimée avec succès !");
+            } catch (error) {
+                console.error("Erreur lors de la suppression :", error);
+                alert("Erreur lors de la suppression de la commande.");
             }
-        }
+        };
+
+        window.deleteAllOrders = async function() {
+            if (confirm("Êtes-vous sûr de vouloir tout supprimer ? Cette action est irréversible.")) {
+            const snapshot = await getDocs(collection(db, "orders"));
+            const batch = writeBatch(db);
+            snapshot.forEach((docSnapshot) => {
+                batch.delete(doc(db, "orders", docSnapshot.id));
+            });
+            try {
+                await batch.commit();
+                alert("Toutes les commandes ont été supprimées !");
+            } catch (error) {
+                console.error("Erreur lors de la suppression de toutes les commandes :", error);
+                alert("Erreur lors de la suppression de toutes les commandes.");
+            }
+            }
+        }; 
+        const ordersTable = document.getElementById("orders");
+        onSnapshot(collection(db, "orders"), (snapshot) => {
+            ordersTable.innerHTML = "";
+            snapshot.forEach((docSnapshot) => {
+                let order = docSnapshot.data();
+                const orderId = docSnapshot.id;
+                ordersTable.innerHTML += `
+                    <tr>
+                        <td>${order.name}</td>
+                        <td>${order.item}</td>
+                        <td>${order.status}</td>
+                        <td><button class="delete-btn" onclick="deleteOrder('${orderId}')">⨯</button></td>
+                    </tr>
+                `;
+            });
+        });
+
+        document.getElementById("orderButton").addEventListener("click", addOrder);
+
+        window.toggleOtherInput = async function() {
+            var checkbox = document.getElementById("otherCheckbox");
+            var textInput = document.getElementById("otherInput");
+
+            textInput.style.display = checkbox.checked ? "block" : "none";
+        }; 
+
+    </script>
+    <script>
 
         function verifAcces(event) {
             var userRole = localStorage.getItem("role");
@@ -179,10 +373,12 @@
             if ((currentPage === "gestion.html" && userRole !== "admin") || 
                 (currentPage === "menu.html" && !userRole)) {
                 alert("Accès interdit. Vous devez être connecté.");
-                window.location.href = "login.html";
+                window.location.href = "menu.html";
             }
         })();
+
     </script>
 </body>
 </html>
+
 
