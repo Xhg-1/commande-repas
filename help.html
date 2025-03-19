@@ -14,20 +14,20 @@
             justify-content: center;
             align-items: center;
             height: 97vh;
-            background: linear-gradient(to right bottom, #0a0738, #303abf);
+            background: linear-gradient(to right bottom, #f68601, #f12d2d);
         }
         .container {
             width: 50%;
-            background:  #313338;
+            background: #1c1e26; /* Gris foncé */
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
             text-align: center;
         }
-        input {
+        input, select, textarea {
             font-family: system-ui;
-            color: #ffffff;
-            background-color: #1e1f22;
+            color: #afb4bb;
+            background-color: #15171d; /* Gris très foncé */
             padding: 12px;
             margin: 8px 0;
             width: 96%;
@@ -35,7 +35,7 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
         button {
-            background: #5764f2;
+            background: #f68601;
             font-family: system-ui;
             color: white;
             font-weight: 599;
@@ -45,12 +45,13 @@
             width: 100%;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
-        button:hover{
-            background-color: #6773f3;
+        button:hover {
+            background-color: #f12d2d;
         }
         nav {
-            background-color: #00000000;
+            background-color: transparent;
             padding: 10px 0;
             display: flex;
             justify-content: center;
@@ -59,7 +60,6 @@
             top: 0;
             left: 0;
         }
-
         nav a {
             color: white;
             font-weight: 600;
@@ -69,51 +69,32 @@
             border-radius: 10px;
             transition: background-color 0.3s;
         }
-
         nav a:hover {
-            background-color: #5764f2;
+            background-color: #f68601;
             border-radius: 10px;
         }
-
         .active {
-            background-color: rgb(255, 255, 255);
+            background-color: #f12d2d;
             font-weight: bold;
-            color: black;
+            color: white;
             border-radius: 10px;
         }
         .content {
             padding: 50px;
             font-size: 24px;
-            color: #ffffff;
+            color: white;
             text-align: left;
             max-width: 1200px;
             margin: auto;
         }
-        h4{
+        h4 {
             font-weight: 400;
             color: #afafaf;
         }
         .disabled {
-            pointer-events: none; /* Désactive le clic */
-            opacity: 0.5; /* Rend l'onglet plus transparent */
-            cursor: not-allowed; /* Change le curseur */
-        }
-        select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 5px;
-
-            font-family: system-ui;
-            color: #ffffff;
-            background-color: #1e1f22;
-        }
-        textarea {
-            width: 96%;
-            padding: 12px;
-            border-radius: 5px;
-            font-family: system-ui;
-            color: #ffffff;
-            background-color: #1e1f22;
+            pointer-events: none;
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         h3 {
             display: flex;
@@ -123,13 +104,14 @@
             font-size: 16px;
         }
 
+
     </style>
 </head>
-<body>
+<body onload="checkUserStatus()">
     <nav>
         <a href="index.html">Découvrir</a>
-        <a href="gestion.html" onclick="verifAcces(event)">Gestion</a>
-        <a href="menu.html">Commande</a>
+        <a href="gestion.html" id="gestion" onclick="verifAcces(event)">Gestion</a>
+        <a href="menu.html" id="menu" onclick="verifAcces(event)">Commande</a>
         <a href="help.html" class="active">Assistance</a>
         <a href="login.html">Connexion</a>
     </nav> <br><br><br>
@@ -168,18 +150,48 @@
             document.getElementById("type").value = "";
             document.getElementById("message").value = "";
         }
-
+  
         function verifAcces(event) {
             var userRole = localStorage.getItem("role");
-            if (userRole !== "admin") {
+            
+            // Bloque l'accès à "Gestion" si l'utilisateur n'est pas admin
+            if (event.target.id === "gestion" && userRole !== "admin") {
                 event.preventDefault();
                 alert("Accès refusé : Vous devez être administrateur.");
-            } else {
-                window.location.href = "gestion.html"; // Redirige si admin
+                return;
+            }
+
+            // Bloque l'accès à "Commande" si l'utilisateur n'est pas connecté
+            if (event.target.id === "menu" && !userRole) {
+                event.preventDefault();
+                alert("Accès refusé : Vous devez être connecté.");
+                return;
             }
         }
 
+        function checkUserStatus() {
+            var userRole = localStorage.getItem("role");
 
+            // Désactiver les onglets si l'utilisateur n'est pas connecté
+            if (!userRole) {
+                document.getElementById("menu").classList.add("disabled");
+            }
+            if (userRole !== "admin") {
+                document.getElementById("gestion").classList.add("disabled");
+            }
+        }
+
+        // Redirection automatique si l'utilisateur essaie d'accéder à une page sans autorisation
+        (function protectPages() {
+            var userRole = localStorage.getItem("role");
+            var currentPage = window.location.pathname.split("/").pop();
+
+            if ((currentPage === "gestion.html" && userRole !== "admin") || 
+                (currentPage === "menu.html" && !userRole)) {
+                alert("Accès interdit. Vous devez être connecté.");
+                window.location.href = "help.html";
+            }
+        })();
 
     </script>
 
