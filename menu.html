@@ -11,20 +11,20 @@
             font-weight: 300;
             padding: 20px;
             text-align: center;
-            background: linear-gradient(to right bottom, #0a0738, #303abf);
+            background: linear-gradient(to right bottom, #f68601, #f12d2d);
         }
         .container {    
-            max-width: 50%;
+            max-width: 60%;
             margin: 0 auto;
-            background: #313338;
+            background: #1c1e26; /* Gris foncé */
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
         }
         input {
             font-family: system-ui;
-            color: white;
-            background-color: #1e1f22;
+            color: #afb4bb;
+            background-color: #15171d; /* Gris très foncé */
             padding: 12px;
             width: 95%;
             border-radius: 5px;
@@ -35,13 +35,13 @@
             border-collapse: collapse;
         }
         table, th, td {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Lignes plus visibles */
             padding: 17px;
             font-size: 15px;
         }
         th {
             font-weight: 500; 
-            background-color: #313338;
+            background-color: #1c1e26; /* Même couleur que le container */
             color: #cacaca;
             text-align: left;
         }
@@ -61,50 +61,39 @@
             color: white;
             cursor: pointer;
         }   
-        .delete-all-btn {
-            background-color: #5764f2;
-            margin-top: 10px; 
-            width: 100%; 
+        .delete-all-btn, .download-btn {
+            background-color: #f68601;
+            width: 100%;
+            transition: background-color 0.3s;
         }
-        .delete-all-btn:hover {
-            background-color: #6773f3;
+        .delete-all-btn:hover, .download-btn:hover {
+            background-color: #f12d2d;
         }
         .delete-btn {
-            background-color: #1e1f22;
+            background-color: #101216;
             padding: 9px;
             width: 70%;
+            transition: background-color 0.3s;
         }
         .delete-btn:hover {
-            background-color: #18181b;
-        }
-        .download-btn {
-            background-color: #5764f2;
-            width: 100%;
-        }
-        .download-btn:hover {
-            background-color: #6773f3;
+            background-color: #0e0f13;
         }
         input[type="checkbox"] {
-            color: white;
             appearance: none;
             width: 17px;
             height: 17px;
-            background-color: #1e1f22;
+            background-color: #15171d;
             cursor: pointer;
             border-radius: 4px;
-            transition: background-color 0.3s, border-color 0.3s;
-            
+            transition: background-color 0.3s;
         }
-
         input[type="checkbox"]:hover {
             background-color: #18181b;
         }
-
         input[type="checkbox"]:checked {
-            background-color: #5764f2;
+            background-color: #f68601;
         }
-  
-        .meal-list{
+        .meal-list {
             display: flex;
             flex-direction: column;
         }
@@ -116,7 +105,7 @@
             color: #cacaca;
         }
         nav {
-            background-color: #00000000;
+            background-color: transparent;
             padding: 10px 0;
             display: flex;
             justify-content: center;
@@ -125,7 +114,6 @@
             top: 0;
             left: 0;
         }
-
         nav a {
             color: white;
             font-weight: 600;
@@ -135,16 +123,14 @@
             border-radius: 10px;
             transition: background-color 0.3s;
         }
-
         nav a:hover {
-            background-color: #5764f2;
+            background-color: #f68601;
             border-radius: 10px;
         }
-
         .active {
-            background-color: rgb(255, 255, 255);
+            background-color: #f12d2d;
             font-weight: bold;
-            color: black;
+            color: #ffffff;
             border-radius: 10px;
         }
         .content {
@@ -155,13 +141,87 @@
             max-width: 1200px;
             margin: auto;
         }
-        h4{
+        h4 {
             font-weight: 400;
             color: #afafaf;
         }
- 
-    </style>
+        .disabled {
+            pointer-events: none; /* Désactive le clic */
+            opacity: 0.5; /* Rend l'onglet plus transparent */
+            cursor: not-allowed;
+        }
 
+    </style> 
+
+</head>
+<body onload="checkUserStatus()">
+    <nav>
+        <a href="index.html">Découvrir</a>
+        <a href="gestion.html" id="gestion" onclick="verifAcces(event)">Gestion</a>
+        <a href="menu.html" id="menu" onclick="verifAcces(event)" class="active">Commande</a>
+        <a href="help.html">Assistance</a>
+        <a href="login.html">Connexion</a>
+    </nav> <br><br><br>
+
+    <div class="container">
+        <h2>Choisissez vos plats !</h2>
+        <h4>Cliquer sur autres si vous voulez preciser votre commande !</h4>
+        <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" />
+        <br><br>    
+            
+        <div class="meal-list">
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Pizza">
+                Pizza
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Salade">
+                Salade
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Burger">
+                Burger
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Pâtes">
+                Pâtes
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" value="Sushi">
+                 Sushi
+            </label><br>
+
+            <label class="meal-item">
+                <input class="checkbox" type="checkbox" id="otherCheckbox" value="" onchange="toggleOtherInput()">
+                Autres : 
+            </label> <br>
+        <input type="text" id="otherInput" placeholder="Précisez votre choix" style="display: none;"><br>
+        
+        
+        </div>
+        <button class="download-btn" id="orderButton">Valider</button>
+    </div>
+    <br>
+    <div class="container">
+        <br>
+        <table id="ordersTable">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Plat commandé</th>
+                    <th>Statut</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="orders"></tbody>
+        </table>
+        <br>
+        <button class="delete-all-btn" onclick="deleteAllOrders()">Tout supprimer</button>
+    </div>
     <script type="module">
         // 🔥 Importation des modules Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -244,8 +304,7 @@
                 alert("Erreur lors de la suppression de toutes les commandes.");
             }
             }
-        };
-
+        }; 
         const ordersTable = document.getElementById("orders");
         onSnapshot(collection(db, "orders"), (snapshot) => {
             ordersTable.innerHTML = "";
@@ -270,81 +329,54 @@
             var textInput = document.getElementById("otherInput");
 
             textInput.style.display = checkbox.checked ? "block" : "none";
-        };
-
-
+        }; 
 
     </script>
+    <script>
 
-</head>
-<body>
-    <nav>
-        <a href="index.html">Découvrir</a>
-        <a href="gestion.html" onclick="verifAcces(event)">Gestion</a>
-        <a href="menu.html"class="active">Commande</a>
-        <a href="help.html">Assistance</a>
-        <a href="login.html">Connexion</a>
-    </nav> <br><br><br>
-
-    <div class="container">
-        <h2>Choisissez vos plats !</h2>
-        <h4>Cliquer sur autres si vous voulez preciser votre commande !</h4>
-        <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" />
-        <br><br>    
+        function verifAcces(event) {
+            var userRole = localStorage.getItem("role");
             
-        <div class="meal-list">
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" value="Pizza">
-                Pizza
-            </label><br>
+            // Bloque l'accès à "Gestion" si l'utilisateur n'est pas admin
+            if (event.target.id === "gestion" && userRole !== "admin") {
+                event.preventDefault();
+                alert("Accès refusé : Vous devez être administrateur.");
+                return;
+            }
 
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" value="Salade">
-                Salade
-            </label><br>
+            // Bloque l'accès à "Commande" si l'utilisateur n'est pas connecté
+            if (event.target.id === "menu" && !userRole) {
+                event.preventDefault();
+                alert("Accès refusé : Vous devez être connecté.");
+                return;
+            }
+        }
 
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" value="Burger">
-                Burger
-            </label><br>
+        function checkUserStatus() {
+            var userRole = localStorage.getItem("role");
 
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" value="Pâtes">
-                Pâtes
-            </label><br>
+            // Désactiver les onglets si l'utilisateur n'est pas connecté
+            if (!userRole) {
+                document.getElementById("menu").classList.add("disabled");
+            }
+            if (userRole !== "admin") {
+                document.getElementById("gestion").classList.add("disabled");
+            }
+        }
 
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" value="Sushi">
-                 Sushi
-            </label><br>
+        // Redirection automatique si l'utilisateur essaie d'accéder à une page sans autorisation
+        (function protectPages() {
+            var userRole = localStorage.getItem("role");
+            var currentPage = window.location.pathname.split("/").pop();
 
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" id="otherCheckbox" value="" onchange="toggleOtherInput()">
-                Autres : 
-            </label> <br>
-        <input type="text" id="otherInput" placeholder="Précisez votre choix" style="display: none;"><br>
-        
-        
-        </div>
-        <button class="download-btn" id="orderButton">Valider</button>
-    </div>
-    <br>
-    <div class="container">
-        <br>
-        <table id="ordersTable">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Plat commandé</th>
-                    <th>Statut</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="orders"></tbody>
-        </table>
-        <br>
-        <button class="delete-all-btn" onclick="deleteAllOrders()">Tout supprimer</button>
-    </div>
+            if ((currentPage === "gestion.html" && userRole !== "admin") || 
+                (currentPage === "menu.html" && !userRole)) {
+                alert("Accès interdit. Vous devez être connecté.");
+                window.location.href = "menu.html";
+            }
+        })();
+
+    </script>
 </body>
 </html>
 
