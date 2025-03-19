@@ -13,7 +13,7 @@
             color: white;
             font-weight: 600;
             height: 200vh;
-            background: linear-gradient(to right bottom, #0a0738, #303abf);
+            background: linear-gradient(to right bottom, #f68601, #f12d2d);
         }
 
         /* Barre de navigation */
@@ -35,14 +35,14 @@
         }
 
         nav a:hover {
-            background-color: #5764f2;
+            background-color: #f68601;
             border-radius: 10px;
         }
 
         .active {
-            background-color: rgb(255, 255, 255);
+            background-color: #f12d2d;
             font-weight: bold;
-            color: black;
+            color: #ffffff;
             border-radius: 10px;
         }
         .content {
@@ -61,14 +61,18 @@
             font-weight: 500;
             font-size: 19px;
         }
+        .disabled {
+            pointer-events: none; /* Désactive le clic */
+            opacity: 0.5; /* Rend l'onglet plus transparent */
+            cursor: not-allowed; /* Change le curseur */
+        }
     </style>
 </head>
-<body>
-
+<body onload="checkUserStatus()">
     <nav>
         <a href="index.html" class="active">Découvrir</a>
-        <a href="gestion.html" onclick="verifAcces(event)">Gestion</a>
-        <a href="menu.html">Commande</a>
+        <a href="gestion.html" id="gestion" onclick="verifAcces(event)">Gestion</a>
+        <a href="menu.html" id="menu" onclick="verifAcces(event)">Commande</a>
         <a href="help.html">Assistance</a>
         <a href="login.html">Connexion</a>
     </nav>
@@ -86,13 +90,45 @@
 
         function verifAcces(event) {
             var userRole = localStorage.getItem("role");
-            if (userRole !== "admin") {
-                event.preventDefault(); // Empêche la navigation
+            
+            // Bloque l'accès à "Gestion" si l'utilisateur n'est pas admin
+            if (event.target.id === "gestion" && userRole !== "admin") {
+                event.preventDefault();
                 alert("Accès refusé : Vous devez être administrateur.");
-            } else {
-                window.location.href = "gestion.html";
+                return;
+            }
+
+            // Bloque l'accès à "Commande" si l'utilisateur n'est pas connecté
+            if (event.target.id === "menu" && !userRole) {
+                event.preventDefault();
+                alert("Accès refusé : Vous devez être connecté.");
+                return;
             }
         }
+
+        function checkUserStatus() {
+            var userRole = localStorage.getItem("role");
+
+            // Désactiver les onglets si l'utilisateur n'est pas connecté
+            if (!userRole) {
+                document.getElementById("menu").classList.add("disabled");
+            }
+            if (userRole !== "admin") {
+                document.getElementById("gestion").classList.add("disabled");
+            }
+        }
+
+        // Redirection automatique si l'utilisateur essaie d'accéder à une page sans autorisation
+        (function protectPages() {
+            var userRole = localStorage.getItem("role");
+            var currentPage = window.location.pathname.split("/").pop();
+
+            if ((currentPage === "gestion.html" && userRole !== "admin") || 
+                (currentPage === "menu.html" && !userRole)) {
+                alert("Accès interdit. Vous devez être connecté.");
+                window.location.href = "index.html";
+            }
+        })();
 
     </script>
 
