@@ -34,7 +34,17 @@
             border-radius: 5px;
             border: 1px solid rgba(0, 0, 0, 0.1);
         }
-        .AddButton {
+        select {
+            font-family: system-ui;
+            color: #afb4bb;
+            background-color: #15171d;
+            padding: 12px;
+            margin: 8px 0;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .addFood {
             background: #f68601;
             font-family: system-ui;
             color: white;
@@ -48,8 +58,24 @@
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
             transition: background-color 0.3s;
         }
-        .AddButton:hover {
+        .addFood:hover {
             background-color: #f12d2d;
+        }
+        .deleteButton {
+            background-color: #101216;
+            width: 10%;
+            border: none;
+            border-radius: 7px;
+            font-weight: 599;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            background-color: #101216;
+            padding: 9px;
+            transition: background-color 0.3s;
+        }
+        .deleteButton:hover {
+            background-color: #0e0f13;
         }
         .QuantityButton {
             background: #101216;
@@ -115,129 +141,92 @@
         }
     </style>
 </head>
-<body onload="checkUserStatus()">
+<body>
     <nav>
         <a href="index.html">Découvrir</a>
         <a href="gestion.html" id="gestion" class="active">Gestion</a>
         <a href="menu.html" id="menu" onclick="verifAcces(event)" >Commande</a>
-        <a href="help.html">Assistance</a>
+        <a href="help.html">Contacter-nous</a>
         <a href="login.html">Connexion</a>
     </nav><br><br><br><br><br>
 
     <div class="container">
-        <h2>Gestion du Stock</h2>
-        <input type="text" id="nom" placeholder="Nom de l'aliment">
-        <input type="number" id="quantite" placeholder="Quantité">
-        <button class="AddButton" onclick="ajouterAliment()">Ajouter</button>
-        <ul id="listeStock"></ul>
+        <h2>Gérer le Menu</h2>
+        <select id="categorySelect">
+            <option value="entrée">Entrée</option>
+            <option value="plats">Plat</option>
+            <option value="desserts">Dessert</option>
+        </select>
+        
+        <input type="text" id="foodInput" placeholder="Nom du plat">
+        <button id="addFood" class="addFood">Ajouter</button>
+        <h3>Liste des plats</h3>
+        <ul id="foodList"></ul>
     </div>
 
-    <script>
-        let stock = JSON.parse(localStorage.getItem("stock")) || [];
 
-        function afficherStock() {
-            let liste = document.getElementById("listeStock");
-            liste.innerHTML = "";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-            stock.forEach((aliment, index) => {
-                let li = document.createElement("li");
-                li.innerHTML = `
-                    <span>${aliment.nom} - <b>${aliment.quantite}</b></span>
-                    <div class="btn-group">
-                        <button class='QuantityButton' onclick="modifierQuantite(${index}, -1)">-</button>
-                        <button class='QuantityButton' onclick="modifierQuantite(${index}, 1)">+</button>
-                        <button class='QuantityButton' onclick="supprimerAliment(${index})">⨯</button>
-                    </div>
-                `;
-                liste.appendChild(li);
+        const firebaseConfig = {
+            apiKey: "AIzaSyBo0RKbnRdWfZL3vL9wxiRCSAo5IVjwJ5U",
+            authDomain: "commande-repas.firebaseapp.com",
+            projectId: "commande-repas",
+            storageBucket: "commande-repas.appspot.com",
+            messagingSenderId: "86197224505",
+            appId: "1:86197224505:web:b6fc2bd8d2927fea82b9e8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const categorySelect = document.getElementById("categorySelect");
+        const foodList = document.getElementById("foodList");
+        const foodInput = document.getElementById("foodInput");
+        const addFoodBtn = document.getElementById("addFood");
+
+        function loadFoodItems(category) {
+            const foodRef = collection(db, category);
+            onSnapshot(foodRef, (snapshot) => {
+                foodList.innerHTML = "";
+                snapshot.forEach((docSnap) => {
+                    let item = docSnap.data();
+                    let foodId = docSnap.id;
+                    foodList.innerHTML += `
+                        <li>${item.name} 
+                            <button class="deleteButton" onclick="deleteFood('${category}', '${foodId}')">⨯</button>
+                        </li>`;
+                });
             });
-
-            localStorage.setItem("stock", JSON.stringify(stock));
         }
 
-        function ajouterAliment() {
-            let nom = document.getElementById("nom").value.trim();
-            let quantite = parseInt(document.getElementById("quantite").value.trim());
+        categorySelect.addEventListener("change", () => {
+            loadFoodItems(categorySelect.value);
+        });
 
-            if (!nom || quantite <= 0 || isNaN(quantite)) {
-                alert("Entrez un nom et une quantité valide !");
-                return;
+        addFoodBtn.addEventListener("click", async () => {
+            const category = categorySelect.value;
+            const foodName = foodInput.value.trim();
+            if (!foodName) return alert("Entrez un nom d'aliment");
+
+            try {
+                await addDoc(collection(db, category), { name: foodName });
+                foodInput.value = "";
+            } catch (error) {
+                console.error("Erreur :", error);
             }
+        });
 
-            let existant = stock.find(a => a.nom.toLowerCase() === nom.toLowerCase());
-
-            if (existant) {
-                existant.quantite += quantite;
-            } else {
-                stock.push({ nom, quantite });
+        window.deleteFood = async function(category, foodId) {
+            try {
+                await deleteDoc(doc(db, category, foodId));
+            } catch (error) {
+                console.error("Erreur :", error);
             }
+        };
 
-            document.getElementById("nom").value = "";
-            document.getElementById("quantite").value = "";
-
-            afficherStock();
-        }
-
-        function modifierQuantite(index, valeur) {
-            if (stock[index]) {
-                stock[index].quantite += valeur;
-
-                if (stock[index].quantite <= 0) {
-                    stock.splice(index, 1);
-                }
-
-                afficherStock();
-            }
-        }
-
-        function supprimerAliment(index) {
-            stock.splice(index, 1);
-            afficherStock();
-        }
- 
-        function verifAcces(event) {
-            var userRole = localStorage.getItem("role");
-            
-            // Bloque l'accès à "Gestion" si l'utilisateur n'est pas admin
-            if (event.target.id === "gestion" && userRole !== "admin") {
-                event.preventDefault();
-                alert("Accès refusé : Vous devez être administrateur.");
-                return;
-            }
-
-            // Bloque l'accès à "Commande" si l'utilisateur n'est pas connecté
-            if (event.target.id === "menu" && !userRole) {
-                event.preventDefault();
-                alert("Accès refusé : Vous devez être connecté.");
-                return;
-            }
-        }
-
-        function checkUserStatus() {
-            var userRole = localStorage.getItem("role");
-
-            // Désactiver les onglets si l'utilisateur n'est pas connecté
-            if (!userRole) {
-                document.getElementById("menu").classList.add("disabled");
-            }
-            if (userRole !== "admin") {
-                document.getElementById("gestion").classList.add("disabled");
-            }
-        }
-
-        // Redirection automatique si l'utilisateur essaie d'accéder à une page sans autorisation
-        (function protectPages() {
-            var userRole = localStorage.getItem("role");
-            var currentPage = window.location.pathname.split("/").pop();
-
-            if ((currentPage === "gestion.html" && userRole !== "admin") || 
-                (currentPage === "menu.html" && !userRole)) {
-                alert("Accès interdit. Vous devez être connecté.");
-                window.location.href = "gestion.html";
-            }
-        })();
-
-        afficherStock();
+        loadFoodItems(categorySelect.value);
     </script>
 </body>
 </html>
