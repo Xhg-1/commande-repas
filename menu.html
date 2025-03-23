@@ -59,7 +59,7 @@
             font-family: system-ui;
             font-weight: 599;
             color: white;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 1);
+            
             cursor: pointer;
         }   
         .delete-all-btn, .download-btn {
@@ -79,7 +79,7 @@
         .delete-btn:hover {
             background-color: #0e0f13;
         }
-        input[type="checkbox"] {
+        input[type="radio"], input[type="checkbox"] {
             appearance: none;
             width: 17px;
             height: 17px;
@@ -88,10 +88,10 @@
             border-radius: 4px;
             transition: background-color 0.3s;
         }
-        input[type="checkbox"]:hover {
+        input[type="radio"]:hover, input[type="checkbox"]:hover{
             background-color: #18181b;
         }
-        input[type="checkbox"]:checked {
+        input[type="radio"]:checked, input[type="checkbox"]:checked {
             background-color: #f68601;
         }
         .meal-list {
@@ -146,6 +146,11 @@
             font-weight: 400;
             color: #afafaf;
         }
+        h3 {
+            color: #f68601;
+            text-align: left;
+            margin-top:0px;
+        }
         .disabled {
             pointer-events: none; /* Désactive le clic */
             opacity: 0.5; /* Rend l'onglet plus transparent */
@@ -153,57 +158,46 @@
         }
 
     </style> 
-
 </head>
 <body onload="checkUserStatus()">
     <nav>
         <a href="index.html">Découvrir</a>
         <a href="gestion.html" id="gestion" onclick="verifAcces(event)">Gestion</a>
         <a href="menu.html" id="menu" onclick="verifAcces(event)" class="active">Commande</a>
-        <a href="help.html">Assistance</a>
+        <a href="help.html">Contacter-nous</a>
         <a href="login.html">Connexion</a>
     </nav> <br><br><br>
 
-    <div class="container">
-        <h2>Choisissez vos plats !</h2>
-        <h4>Cliquer sur autres si vous voulez preciser votre commande !</h4>
-        <input class="input" type="text" id="nameInput" placeholder="Nom et Prénom" />
-        <br><br>    
-            
-        <div class="meal-list">
+        <div class="container">
+            <h2>Choisissez votre menu !</h2>
+            <h4>Cliquer sur autres si vous voulez preciser votre commande !</h4>
+            <input type="text" id="nameInput" placeholder="Nom et Prénom" /><br><br>
+
+            <h3>Entrée :</h3>
+            <div class="meal-list">
+                <label class="meal-item"><input type="radio" class="entrée" name="entrée" value="Salade"> Salade</label><br>
+                <label class="meal-item"><input type="radio" class="entrée" name="entrée" value="Soupe"> Soupe</label><br>
+                <label class="meal-item"><input type="radio" class="entrée" name="entrée" value="Charcuterie"> Charcuterie</label><br>
+            </div>
+
+            <h3>Plat :</h3>
+            <div class="meal-list">
+                <label class="meal-item"><input type="radio" class="plat" name="plat" value="Pizza"> Pizza</label><br>
+                <label class="meal-item"><input type="radio" class="plat" name="plat" value="Burger"> Burger</label><br>
+                <label class="meal-item"><input type="radio" class="plat" name="plat" value="Pâtes"> Pâtes</label><br>
+            </div>
+
+            <h3>Dessert :</h3>
+            <div class="meal-list">
+                <label class="meal-item"><input type="radio" class="dessert" name="dessert" value="Tarte"> Tarte</label><br>
+                <label class="meal-item"><input type="radio" class="dessert" name="dessert" value="Glace"> Glace</label><br>
+                <label class="meal-item"><input type="radio" class="dessert" name="dessert" value="Fruit"> Fruit</label><br>
+            </div>
+            <h3>Options :</h3>
             <label class="meal-item">
-                <input class="checkbox" type="checkbox" value="Pizza">
-                Pizza
+                <input type="checkbox" id="sansCouverts"> Couverts
             </label><br>
 
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" value="Salade">
-                Salade
-            </label><br>
-
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" value="Burger">
-                Burger
-            </label><br>
-
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" value="Pâtes">
-                Pâtes
-            </label><br>
-
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" value="Sushi">
-                 Sushi
-            </label><br>
-
-            <label class="meal-item">
-                <input class="checkbox" type="checkbox" id="otherCheckbox" value="" onchange="toggleOtherInput()">
-                Autres : 
-            </label> <br>
-        <input type="text" id="otherInput" placeholder="Précisez votre choix" style="display: none;"><br>
-        
-        
-        </div>
         <button class="download-btn" id="orderButton">Valider</button>
     </div>
     <br>
@@ -214,7 +208,7 @@
                 <tr>
                     <th>Nom</th>
                     <th>Plat commandé</th>
-                    <th>Statut</th>
+                    <th>Couverts</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -224,11 +218,9 @@
         <button class="delete-all-btn" onclick="deleteAllOrders()">Tout supprimer</button>
     </div>
     <script type="module">
-        // 🔥 Importation des modules Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // 🔹 Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBo0RKbnRdWfZL3vL9wxiRCSAo5IVjwJ5U",
             authDomain: "commande-repas.firebaseapp.com",
@@ -238,47 +230,39 @@
             appId: "1:86197224505:web:b6fc2bd8d2927fea82b9e8"
         };
 
-        // 📌 Initialisation de Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
  
         async function addOrder() {
-    const name = document.getElementById("nameInput").value.trim();
-    const item = Array.from(document.querySelectorAll('.meal-item input:checked'))
-                                .map(checkbox => checkbox.value);
+            const name = document.getElementById("nameInput").value.trim();
+            const entrées = Array.from(document.querySelectorAll('.entrée:checked')).map(cb => cb.value);
+            const plats = Array.from(document.querySelectorAll('.plat:checked')).map(cb => cb.value);
+            const desserts = Array.from(document.querySelectorAll('.dessert:checked')).map(cb => cb.value);
+            const sansCouverts = document.getElementById("sansCouverts").checked ? "Oui" : "Non";
+            const item = [...entrées, ...plats, ...desserts]
 
-    // Si la case "Autres" est cochée, on ajoute la valeur du champ "Autres"
-    const otherInput = document.getElementById("otherInput").value.trim();
-    if (document.getElementById("otherCheckbox").checked && otherInput !== "") {
-        item.push(otherInput);
-    }
+            if (!name) return alert("Veuillez entrer votre nom !");
+            if (entrées.length === 0 || plats.length === 0 || desserts.length === 0) {
+                return alert("Veuillez choisir une entrée, un plat et un dessert !");
+            }
 
-    // Si aucun plat n'est sélectionné
-    if (item.length === 0) return alert("Veuillez sélectionner au moins un plat.");
+            const order = { name, meals: item };
 
-    if (name === "") {
-        return alert("Veuillez entrer un nom !");
-    }
+            try {
+                await addDoc(collection(db, "orders"), {
+                    name: name,
+                    item: item,
+                    status: sansCouverts
+                });
 
-    const order = { name, meals: item };
-
-    try {
-        await addDoc(collection(db, "orders"), {
-            name: name,
-            item: item,
-            status: "En préparation"
-        });
-
-        // ✅ Effacer les champs après envoi
-        document.getElementById("nameInput").value = "";
-        document.getElementById("otherInput").value = "";
-        document.querySelectorAll('.meal-item input').forEach(input => input.checked = false);
-        alert("Commande ajoutée avec succès !");
-    } catch (error) {
-        console.error("Erreur lors de l'ajout :", error);
-        alert("Erreur lors de l'ajout de la commande. Vérifiez la console.");
-    }
-}
+                document.getElementById("nameInput").value = "";
+                document.querySelectorAll("input[type=radio]").forEach(cb => cb.checked = false);
+            } catch (error) {
+                console.error("Erreur :", error);
+                alert("Erreur lors de l'ajout de la commande.");
+            }
+        }
+        document.getElementById("orderButton").addEventListener("click", addOrder);
 
         window.deleteOrder = async function(orderId) {
             try {
